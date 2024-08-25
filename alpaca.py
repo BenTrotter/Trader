@@ -25,26 +25,30 @@ def moving_average_crossover_strategy(data):
     """
     data['SMA_9'] = data['close'].rolling(window=9).mean()
     data['SMA_21'] = data['close'].rolling(window=21).mean()
-    
+    print(f"\nSMA_9: {data['SMA_9'].iloc[-1]}")
+    print(f"SMA_21: {data['SMA_21'].iloc[-1]}")
+    print(f"Price: {data['close'].iloc[-1]}")
+
     if data['SMA_9'].iloc[-1] > data['SMA_21'].iloc[-1]:
         return 'buy'
     elif data['SMA_9'].iloc[-1] < data['SMA_21'].iloc[-1]:
         return 'sell'
     return 'hold'
 
-def trade_stock(ticker):
+def trade_stock(ticker, position_ticker):
     """
     Stream live data and trade stock using Alpaca API.
     Args:
         ticker (str): The stock ticker symbol to trade.
     """
+    position_manual = False
     while True:
         try:
-            bars = api.get_crypto_bars(ticker, TimeFrame.Minute, limit=21).df
+            bars = api.get_crypto_bars(ticker, TimeFrame.Minute).df
 
             # Inspect the structure of the DataFrame
-            # print("Columns:", bars.columns)
-            # print("Sample Data:\n", bars.head())
+            print("Columns:", bars.columns)
+            print("Sample Data:\n", bars.tail())
 
             # Convert the returned data to DataFrame
             if 'close' not in bars.columns:
@@ -55,31 +59,33 @@ def trade_stock(ticker):
             })
             
             signal = moving_average_crossover_strategy(data)
-            
-            position = api.list_positions()
-            position = next((pos for pos in position if pos.symbol == ticker), None)
-            
-            print(f"Signal: {signal}\nPosition: {position}")
 
-            if signal == 'buy' and not position:
+            
+            # position = api.list_positions()
+            # position = next((pos for pos in position if pos.symbol == position_ticker), None)
+            
+            print(f"Signal: {signal}\nPosition: {position_manual}\n")
+
+            if signal == 'buy' and not position_manual:
                 api.submit_order(
-                    symbol=ticker,
-                    qty=0.01,  # Number of shares to buy
+                    symbol=position_ticker,
+                    qty=0.001,  # Number of shares to buy
                     side='buy',
                     type='market',
                     time_in_force='gtc'
                 )
-                print(f"Bought 10 shares of {ticker}")
+                print(f"Bought 0.001 shares of {ticker}")
 
-            elif signal == 'sell' and position:
+
+            elif signal == 'sell' and position_manual:
                 api.submit_order(
-                    symbol=ticker,
-                    qty=10,  # Number of shares to sell
+                    symbol=position_ticker,
+                    qty=0.001,  # Number of shares to sell
                     side='sell',
                     type='market',
                     time_in_force='gtc'
                 )
-                print(f"Sold 10 shares of {ticker}")
+                print(f"Sold 0.001 shares of {ticker}")
 
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -88,5 +94,6 @@ def trade_stock(ticker):
 
 if __name__ == "__main__":
     # Example ticker to trade
+    position_ticker = "BTCUSD"
     selected_ticker = "BTC/USD"
-    trade_stock(selected_ticker)
+    trade_stock(selected_ticker, position_ticker)
