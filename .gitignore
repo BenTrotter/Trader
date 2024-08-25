@@ -1,0 +1,13 @@
+# Ignore log files
+*.log
+
+# Ignore environment files
+Trader_venv/
+
+.DS_Store
+
+.env
+
+client_secret.json
+
+token.json
