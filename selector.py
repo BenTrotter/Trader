@@ -1,6 +1,7 @@
 # stock_selector.py
 import yfinance as yf
 import pandas_ta as ta
+import numpy as np
 
 def select_stock():
     """
@@ -26,7 +27,8 @@ def select_stock():
         if stock_data['SMA_50'].iloc[-1] > stock_data['SMA_200'].iloc[-1]:
             selected_stock = ticker
             break  # Select the first stock meeting criteria
-
+        else:
+            print("No stocks meets the criteria")
     return selected_stock
 
 if __name__ == "__main__":
