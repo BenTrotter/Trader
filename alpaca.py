@@ -64,7 +64,7 @@ def trade_stock(ticker):
             if signal == 'buy' and not position:
                 api.submit_order(
                     symbol=ticker,
-                    qty=10,  # Number of shares to buy
+                    qty=0.01,  # Number of shares to buy
                     side='buy',
                     type='market',
                     time_in_force='gtc'
