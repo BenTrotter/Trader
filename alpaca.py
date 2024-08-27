@@ -11,7 +11,7 @@ load_dotenv()
 # Alpaca API credentials
 API_KEY = os.getenv('ALPACA_API_KEY')
 SECRET_KEY = os.getenv('ALPACA_SECRET_KEY')
-BASE_URL = 'https://paper-api.alpaca.markets'
+BASE_URL = 'https://paper-api.alpaca.markets/v2'
 
 api = tradeapi.REST(API_KEY, SECRET_KEY, BASE_URL, api_version='v2')
 
@@ -75,6 +75,7 @@ def trade_stock(ticker, position_ticker):
                     time_in_force='gtc'
                 )
                 print(f"Bought 0.001 shares of {ticker}")
+                position_manual = True
 
 
             elif signal == 'sell' and position_manual:
@@ -86,6 +87,7 @@ def trade_stock(ticker, position_ticker):
                     time_in_force='gtc'
                 )
                 print(f"Sold 0.001 shares of {ticker}")
+                position_manual = False
 
         except Exception as e:
             print(f"An error occurred: {e}")
