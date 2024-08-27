@@ -1,13 +1,15 @@
 from datetime import datetime
 from tabulate import tabulate
 
-class Strategy:
+class Trading_session:
     def __init__(self, 
                  starting_balance: float,
                  ):
         self.starting_balance = starting_balance
         self.current_balance = starting_balance
         self.trades= []
+        self.average_duration_of_trade = ""
+        self.percentage_change_of_strategy = 0.0
 
 
     def add_trade(self, trade):
@@ -18,11 +20,46 @@ class Strategy:
     def update_balance(self, trade):
         self.current_balance += trade.profit
 
+
+    def display_trades(self):
+        total_profit = 0
+        for tr in self.trades:
+            total_profit = tr.profit + total_profit
+            print(tr)
+
+
+    def calculate_percentage_change_of_strategy(self):
+        self.percentage_change_of_strategy = (self.current_balance - self.starting_balance) * 100 / self.starting_balance
+
+
+    def calculate_average_duration(self):
+        # Check if the trades list is empty
+        if not self.trades:
+            return "00:00:00"  # or return None, or raise an exception as per your needs
+
+        # Calculate total duration in seconds
+        total_seconds = sum(trade.calculate_duration_in_seconds() for trade in self.trades)
+        
+        # Calculate average duration in seconds
+        average_seconds = total_seconds / len(self.trades)
+        
+        # Convert average duration to HH:MM:SS format
+        hours = int(average_seconds // 3600)
+        minutes = int((average_seconds % 3600) // 60)
+        seconds = int(average_seconds % 60)
+        
+        self.average_duration_of_trade = f"{hours:02}:{minutes:02}:{seconds:02}"
+
+
     def __str__(self) -> str:
-        return ("")
+        return (f"\nStarting Balance: ${self.starting_balance:.2f}\n"
+                f"Current Balance: ${self.current_balance:.2f}\n"
+                f"Number of Trades: {len(self.trades)}\n"
+                f"Average Trade Duration: {self.average_duration_of_trade}\n"
+                f"Strategy percentage change: {self.percentage_change_of_strategy:.2f}%\n")
 
 
-class Trade(Strategy):
+class Trade(Trading_session):
     
     def __init__(self,
                  open_price: float,
@@ -37,8 +74,8 @@ class Trade(Strategy):
                  ):
         self.open_time = open_time
         self.close_time = close_time
-        self.open_price = open_price
-        self.close_price = close_price
+        self.open_price = round(open_price, 2)
+        self.close_price = round(close_price, 2)
         self.quantity = quantity
         self.long = long
         self.short = short
@@ -117,6 +154,7 @@ class Trade(Strategy):
         self.profit, self.profit_pct = self.calculate_profit()
         self.duration = self.calculate_duration()
         self.close_reason = close_reason
+        # super().update_balance(self)
         return self
 
     def __str__(self):

@@ -2,7 +2,7 @@
 import pandas as pd
 import yfinance as yf
 import os
-from trade import Trade
+from trading_session import *
 from datetime import datetime
 from strategies import *
 from data_visualisation import *
@@ -18,26 +18,6 @@ def fetch_historical_data(ticker, period, interval):
     return yf.download(ticker, period=period, interval=interval)
 
 
-
-def calculate_average_duration(trades):
-    # Check if the trades list is empty
-    if not trades:
-        return "00:00:00"  # or return None, or raise an exception as per your needs
-
-    # Calculate total duration in seconds
-    total_seconds = sum(trade.calculate_duration_in_seconds() for trade in trades)
-    
-    # Calculate average duration in seconds
-    average_seconds = total_seconds / len(trades)
-    
-    # Convert average duration to HH:MM:SS format
-    hours = int(average_seconds // 3600)
-    minutes = int((average_seconds % 3600) // 60)
-    seconds = int(average_seconds % 60)
-    
-    return f"{hours:02}:{minutes:02}:{seconds:02}"
-
-
 def open_trade(open_time, open_price, trade_type):
     """
     Args:
@@ -50,36 +30,16 @@ def open_trade(open_time, open_price, trade_type):
         long=trade_type,
         short= not trade_type,
         take_profit_pct=0.04,
-        stop_loss_pct=0.02
-        )
+        stop_loss_pct=0.02)
 
 
-def display_trades(trades):
-    total_profit = 0
-    for tr in trades:
-        total_profit = tr.profit + total_profit
-        print(tr)
-    
-    print(f"\nTotal profit: ${total_profit:.2f}")
-    print(f"Number of trades: {len(trades)}")
-    print(f"Average duration of trade: {calculate_average_duration(trades)}\n\n")
+def backtest_strategy(ticker, period, interval, strategy, *args):
 
-
-# TODO: We need to enhance this method
-def calculate_performance_of_trades(trades):
-    total_profit_pct = 0
-    for tr in trades:
-        total_profit_pct = tr.profit_pct + total_profit_pct
-    print(f"\nTotal profit percentage for strategy: {total_profit_pct}\n")
-    return total_profit_pct
-
-
-def backtest_strategy(ticker):
-
-    data = fetch_historical_data(ticker, "1d", "1m")
-    strategy_data = moving_average_crossover_strategy(data)
+    data = fetch_historical_data(ticker, period, interval)
+    strategy_data = strategy(data, *args)
     strategy_data.to_csv(os.path.abspath(os.getcwd())+'/'+ticker+'.csv')
-    trades = []
+    
+    trading_session = Trading_session(1000)
 
     # Convert the Datetime column to datetime objects
     strategy_data.index = pd.to_datetime(strategy_data.index)
@@ -91,24 +51,24 @@ def backtest_strategy(ticker):
         if trade != None:
             if trade.long:
                 if row['High'] >= trade.take_profit_price:
-                    trades.append(trade.close_trade(index, row['Close'], "Reached take profit")) # Close Long
+                    trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached take profit")) # Close Long
                     trade = None
                 elif row['Signal'] == -1:
-                    trades.append(trade.close_trade(index, row['Close'], "Next short signal reached")) # Close Long
+                    trading_session.add_trade(trade.close_trade(index, row['Close'], "Next short signal reached")) # Close Long
                     trade = open_trade(index, row['Close'], False) # Open short
                 elif row['Low'] <= trade.stop_loss_price:
-                    trades.append(trade.close_trade(index, row['Close'], "Reached stop loss")) # Close Long
+                    trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached stop loss")) # Close Long
                     trade = None
             
             elif trade.short:
                 if row['Low'] <= trade.take_profit_price:
-                    trades.append(trade.close_trade(index, row['Close'], "Reached take profit")) # Close Short
+                    trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached take profit")) # Close Short
                     trade = None
                 elif row['Signal'] == 1:
-                    trades.append(trade.close_trade(index, row['Close'], "Next long signal reached")) # Close Short
+                    trading_session.add_trade(trade.close_trade(index, row['Close'], "Next long signal reached")) # Close Short
                     trade = open_trade(index, row['Close'], True) # Open Long
                 elif row['High'] >= trade.stop_loss_price:
-                    trades.append(trade.close_trade(index, row['Close'], "Reached stop loss")) # Close Short
+                    trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached stop loss")) # Close Short
                     trade = None
 
         elif trade == None:
@@ -117,12 +77,15 @@ def backtest_strategy(ticker):
             elif row['Signal'] == -1:
                 trade = open_trade(index, row['Close'], False)
         
-    display_trades(trades)
-    plot_strategy(strategy_data,trades, ticker, "MA Crossover")
+    trading_session.display_trades()
+    trading_session.calculate_percentage_change_of_strategy()
+    trading_session.calculate_average_duration()
+    plot_strategy(strategy_data, trading_session.trades, ticker, "MA Crossover")
+    print(trading_session)
 
-    return calculate_performance_of_trades(trades)
+    return trading_session.percentage_change_of_strategy
     
 
 if __name__ == "__main__":
     ticker = 'AMZN'
-    backtest_strategy(ticker)
+    backtest_strategy(ticker, "1d", "1m", moving_average_crossover_strategy, 12, 32)

@@ -2,16 +2,18 @@ import numpy as np
 import pandas as pd
 
 
-def moving_average_crossover_strategy(data):
+def moving_average_crossover_strategy(data, short_window, long_window):
     """
     Moving average crossover strategy.
     """
-    data['SMA_9'] = data['Close'].rolling(window=9).mean()
-    data['SMA_21'] = data['Close'].rolling(window=21).mean()
+    short_window_name = f'SMA_{short_window}'
+    long_window_name = f'SMA_{long_window}'
+    data[short_window_name] = data['Close'].rolling(window=short_window).mean()
+    data[long_window_name] = data['Close'].rolling(window=long_window).mean()
     
     data['Signal'] = 0
-    data['Signal'] = np.where((data['SMA_9'] > data['SMA_21']) & (data['SMA_9'].shift(1) <= data['SMA_21'].shift(1)), 1, data['Signal'])
-    data['Signal'] = np.where((data['SMA_9'] < data['SMA_21']) & (data['SMA_9'].shift(1) >= data['SMA_21'].shift(1)), -1, data['Signal'])
+    data['Signal'] = np.where((data[short_window_name] > data[long_window_name]) & (data[short_window_name].shift(1) <= data[long_window_name].shift(1)), 1, data['Signal'])
+    data['Signal'] = np.where((data[short_window_name] < data[long_window_name]) & (data[short_window_name].shift(1) >= data[long_window_name].shift(1)), -1, data['Signal'])
     
     data['Position'] = data['Signal'].diff()
     data.dropna(inplace=True)
