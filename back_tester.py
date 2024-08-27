@@ -46,7 +46,7 @@ def open_trade(open_time, open_price, trade_type):
     return Trade(
         open_time=open_time,
         open_price=open_price,
-        quantity=1000,
+        quantity=1,
         long=trade_type,
         short= not trade_type,
         take_profit_pct=0.04,

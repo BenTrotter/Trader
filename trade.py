@@ -13,7 +13,7 @@ class Trade:
                  open_time: datetime = None,
                  close_time: datetime = None,
                  quantity: float = 1,
-                 close_reason: str = ""):
+                 ):
         self.open_time = open_time
         self.close_time = close_time
         self.open_price = open_price
@@ -23,6 +23,7 @@ class Trade:
         self.short = short
         self.take_profit_pct = take_profit_pct
         self.stop_loss_pct = stop_loss_pct
+        self.value_of_trade = self.calculate_value_of_trade()
         self.take_profit_price = self.calculate_take_profit_price()
         self.stop_loss_price = self.calculate_stop_loss_price()
         self.profit_pct = 0
@@ -30,6 +31,10 @@ class Trade:
         self.profit = 0
         self.close_reason = ""
     
+    def calculate_value_of_trade(self) -> float:
+        """
+        """
+        return self.open_price * self.quantity
 
     def calculate_profit(self) -> float:
         """
@@ -102,6 +107,7 @@ class Trade:
             ["Open Price", f"${self.open_price:.2f}"],
             ["Close Price", f"${self.close_price:.2f}"],
             ["Quantity", self.quantity],
+            ["Trade Value", f"${self.value_of_trade:.2f}"],
             ["Trade Type", "Long" if self.long else "Short"],
             ["Take Profit Price", f"${self.take_profit_price:.2f}" if self.take_profit_price else "N/A"],
             ["Stop Loss Price", f"${self.stop_loss_price:.2f}" if self.stop_loss_price else "N/A"],
