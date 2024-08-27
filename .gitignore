@@ -8,6 +8,8 @@ Trader_venv/
 
 .env
 
+*.csv
+
 client_secret.json
 
 token.json
