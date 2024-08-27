@@ -1,7 +1,28 @@
 from datetime import datetime
 from tabulate import tabulate
 
-class Trade:
+class Strategy:
+    def __init__(self, 
+                 starting_balance: float,
+                 ):
+        self.starting_balance = starting_balance
+        self.current_balance = starting_balance
+        self.trades= []
+
+
+    def add_trade(self, trade):
+        self.trades.append(trade)
+        self.update_balance(trade)
+
+
+    def update_balance(self, trade):
+        self.current_balance += trade.profit
+
+    def __str__(self) -> str:
+        return ("")
+
+
+class Trade(Strategy):
     
     def __init__(self,
                  open_price: float,
