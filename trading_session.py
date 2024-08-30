@@ -154,8 +154,8 @@ class Trade(Trading_session):
         self.profit, self.profit_pct = self.calculate_profit()
         self.duration = self.calculate_duration()
         self.close_reason = close_reason
-        # super().update_balance(self)
         return self
+    
 
     def __str__(self):
         # Prepare the data for tabulation

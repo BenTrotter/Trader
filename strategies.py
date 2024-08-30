@@ -6,6 +6,10 @@ def moving_average_crossover_strategy(data, short_window, long_window):
     """
     Moving average crossover strategy.
     """
+    if len(data) < long_window:
+        print(f"Not enough data to calculate moving averages. Current data length: {len(data)}")
+        return data 
+    
     short_window_name = f'SMA_{short_window}'
     long_window_name = f'SMA_{long_window}'
     data[short_window_name] = data['Close'].rolling(window=short_window).mean()
@@ -15,7 +19,6 @@ def moving_average_crossover_strategy(data, short_window, long_window):
     data['Signal'] = np.where((data[short_window_name] > data[long_window_name]) & (data[short_window_name].shift(1) <= data[long_window_name].shift(1)), 1, data['Signal'])
     data['Signal'] = np.where((data[short_window_name] < data[long_window_name]) & (data[short_window_name].shift(1) >= data[long_window_name].shift(1)), -1, data['Signal'])
     
-    data['Position'] = data['Signal'].diff()
     data.dropna(inplace=True)
 
     return data
