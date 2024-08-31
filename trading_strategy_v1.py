@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from back_tester import fetch_historical_data
+# from back_tester import fetch_historical_data             # Comment out to use strategy in backtester
 import os
 
 FILTER = []
@@ -32,10 +32,9 @@ def SMA_RSI_MACD_Strat(df,
 
     return df
 
+
 # Filter signal which checks that the previous 3 closing prices have been above the SMA with period defined as sma_window
 def generate_SMA_filter_signal(df, sma_window, look_back_period):
-
-    df.reset_index(inplace=True)
 
     sma_window_name = f'SMA_{sma_window}'
 
@@ -53,6 +52,7 @@ def generate_SMA_filter_signal(df, sma_window, look_back_period):
             df.loc[i, 'Filter_Signal'] = -1  # Sell signal
     
     return df
+
 
 # Set up signal
 def generate_RSI_setup_signal(df, period, overbought_condition, oversold_condition):
@@ -89,6 +89,7 @@ def generate_RSI_setup_signal(df, period, overbought_condition, oversold_conditi
 
     return df
 
+
 # Trigger signal
 def generate_MACD_trigger_signal(df, fast_period, slow_period, signal_period):
 
@@ -119,7 +120,7 @@ def generate_MACD_trigger_signal(df, fast_period, slow_period, signal_period):
 
 
 def test_indicator():
-    df = fetch_historical_data("AAPL", "1d", "1m")
+    # df = fetch_historical_data("AAPL", "1d", "1m")
     # print(generate_sma_signal(df, 60))
     # print(generate_RSI_signal(df, 14, 70, 30).head(10))
     print(generate_MACD_trigger_signal(df, 6, 12, 5).head(10))
@@ -128,7 +129,7 @@ def test_strategy():
     ticker="AAPL"
     data_period = "5d"
     data_interval = "1m"
-    df = fetch_historical_data(ticker, data_period, data_interval)
+    # df = fetch_historical_data(ticker, data_period, data_interval)
     df = (SMA_RSI_MACD_Strat(df, 
                             60,
                             3,
