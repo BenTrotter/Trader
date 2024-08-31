@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-# from back_tester import fetch_historical_data             # Comment out to use strategy in backtester
+# from back_tester import fetch_historic_yfinance_data             # Comment out to use strategy in backtester
 import os
 
 FILTER = []
@@ -30,14 +30,26 @@ def SMA_RSI_MACD_Strat(df,
         axis=1
     )
 
+    return df    
+
+def combined_strategy(df, filter_func, setup_func, trigger_func, filter_params={}, setup_params={}, trigger_params={}):
+    # Apply filter, setup, and trigger functions to the DataFrame
+    df = filter_func(df, **filter_params)
+    df = setup_func(df, **setup_params)
+    df = trigger_func(df, **trigger_params)
+
+    # Combine the signals into a final trading signal
+    df['Combined_Signal'] = df[['Filter_Signal', 'Setup_Signal', 'Trigger_Signal']].apply(
+        lambda row: 1 if all(row == 1) else (-1 if all(row == -1) else 0),
+        axis=1
+    )
+
     return df
 
 
 # Filter signal which checks that the previous 3 closing prices have been above the SMA with period defined as sma_window
 def generate_SMA_filter_signal(df, sma_window, look_back_period):
-
     sma_window_name = f'SMA_{sma_window}'
-
     df[sma_window_name] = df['Close'].rolling(window=sma_window).mean()
 
     # Initialize the 'signal' column with NaN
@@ -119,26 +131,24 @@ def generate_MACD_trigger_signal(df, fast_period, slow_period, signal_period):
     return df
 
 
-def test_indicator():
-    # df = fetch_historical_data("AAPL", "1d", "1m")
-    # print(generate_sma_signal(df, 60))
-    # print(generate_RSI_signal(df, 14, 70, 30).head(10))
-    print(generate_MACD_trigger_signal(df, 6, 12, 5).head(10))
+# def test_indicator():
+#     # df = fetch_historical_data("AAPL", "1d", "1m")
+#     # print(generate_sma_signal(df, 60))
+#     # print(generate_RSI_signal(df, 14, 70, 30).head(10))
+#     print(generate_MACD_trigger_signal(df, 6, 12, 5).head(10))
 
 def test_strategy():
     ticker="AAPL"
     data_period = "5d"
     data_interval = "1m"
-    # df = fetch_historical_data(ticker, data_period, data_interval)
-    df = (SMA_RSI_MACD_Strat(df, 
-                            60,
-                            3,
-                            14,
-                            70,
-                            30,
-                            6, 
-                            12, 
-                            5))
+    # df = fetch_historic_yfinance_data(ticker, data_period, data_interval)
+    df = (combined_strategy(df, 
+                            filter_func=generate_SMA_filter_signal,
+                            setup_func=generate_RSI_setup_signal,
+                            trigger_func=generate_MACD_trigger_signal,
+                            filter_params={'sma_window': 50, 'look_back_period': 3},
+                            setup_params={'period': 14, 'overbought_condition': 70, 'oversold_condition': 30},
+                            trigger_params={'fast_period': 12, 'slow_period': 26, 'signal_period': 9}))
     signal_columns = ['Datetime', 'Filter_Signal', 'Setup_Signal', 'Trigger_Signal', 'Combined_Signal', 'Close']
     print(df[signal_columns])
     df[signal_columns].to_csv(os.path.abspath(os.getcwd())+'/'+ticker+'.csv')

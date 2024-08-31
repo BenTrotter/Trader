@@ -34,7 +34,7 @@ def objective(trial):
     )
 
     # Backtest strategy
-    profit_percent = backtest_strategy(ticker, strategy, False)
+    profit_percent = backtest_strategy(ticker, False, strategy)
     
     # We want to maximize profit, so we return negative profit
     return -profit_percent
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     study = optuna.create_study(direction='minimize')
     
     # Optimize the objective function
-    study.optimize(objective, n_trials=10)  # You can adjust the number of trials
+    study.optimize(objective, n_trials=30)  # You can adjust the number of trials
 
     # Print best parameters and best value
     print("Best parameters: ", study.best_params)
@@ -70,5 +70,5 @@ if __name__ == "__main__":
     slow_period = study.best_params.get("slow_period")
     signal_period = study.best_params.get("signal_period")
     data = SMA_RSI_MACD_Strat(data, sma_window, look_back_period, period, overbought_condition, oversold_condition, fast_period, slow_period, signal_period)
-    backtest_strategy(ticker, data, True)
+    backtest_strategy(ticker, True, data)
 

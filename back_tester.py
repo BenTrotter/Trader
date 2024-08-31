@@ -6,7 +6,7 @@ from trading_session import *
 from datetime import datetime
 from strategies import *
 from data_visualisation import *
-from  trading_strategy_v1 import SMA_RSI_MACD_Strat
+from  trading_strategy_v1 import *
 from alpaca.data.historical import StockHistoricalDataClient, CryptoHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest, CryptoBarsRequest
 from alpaca.data.timeframe import TimeFrame
@@ -115,7 +115,7 @@ def analyse_row(trading_session, trade, row):
     return trade, trading_session
 
 
-def backtest_strategy(ticker, data, display_backtester):
+def backtest_strategy(ticker, display_backtester, data):
 
     trading_session = Trading_session(1000)
 
@@ -155,4 +155,12 @@ if __name__ == "__main__":
         interval = '5m'
         data = fetch_historic_yfinance_data(ticker, period_start, period_end, interval)
 
-    backtest_strategy(ticker, SMA_RSI_MACD_Strat(data, 40, 1, 5, 62, 36, 4, 11, 17), True)
+    backtest_strategy(ticker,
+                      True,
+                      combined_strategy(data, 
+                            filter_func=generate_SMA_filter_signal,
+                            setup_func=generate_RSI_setup_signal,
+                            trigger_func=generate_MACD_trigger_signal,
+                            filter_params={'sma_window': 50, 'look_back_period': 3},
+                            setup_params={'period': 14, 'overbought_condition': 70, 'oversold_condition': 30},
+                            trigger_params={'fast_period': 12, 'slow_period': 26, 'signal_period': 9}))
