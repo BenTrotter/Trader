@@ -12,20 +12,21 @@ from alpaca.data.requests import StockBarsRequest, CryptoBarsRequest
 from alpaca.data.timeframe import TimeFrame
 from dotenv import load_dotenv
 
-# If this is true, it prints the trading session class and its associated trades
-display_backtester = True
 
-
-def fetch_historic_yfinance_data(ticker, period, interval):
+def fetch_historic_yfinance_data(ticker, start_date, end_date, interval):
     """
-    Fetches historical stock data for a given ticker.
+    Fetches historical stock data for a given ticker between two dates.
     Args:
         ticker (str): The stock ticker symbol.
+        start_date (str): The start date for data retrieval (format 'YYYY-MM-DD').
+        end_date (str): The end date for data retrieval (format 'YYYY-MM-DD').
+        interval (str): The data interval (e.g., '1d', '1m', '5m').
     Returns:
         pd.DataFrame: DataFrame with historical stock data.
     """
 
-    download_df = yf.download(ticker, period=period, interval=interval)
+    # Fetch data between start_date and end_date
+    download_df = yf.download(ticker, start=start_date, end=end_date, interval=interval)
 
     download_df.reset_index(inplace=True)
 
@@ -114,7 +115,7 @@ def analyse_row(trading_session, trade, row):
     return trade, trading_session
 
 
-def backtest_strategy(ticker, data):
+def backtest_strategy(ticker, data, display_backtester):
 
     trading_session = Trading_session(1000)
 
@@ -136,26 +137,22 @@ def backtest_strategy(ticker, data):
 
 if __name__ == "__main__":
     
-    data_source = 'Alpaca'
+    data_source = 'YFinance'
     ticker = "AMZN"
-    
+    period_start = '2024-08-28'
+    period_end = '2024-08-29'
+
     if data_source == 'Alpaca':
 
         # Fetch alpaca data arguments
         stock = True
         crypto = False
-        period_start = "2024-01-01"
-        period_end = "2024-01-03"
         time_frame = TimeFrame.Minute
 
         data = fetch_historic_alpaca_data(stock, crypto, period_start, period_end, ticker, time_frame)
 
     elif data_source == 'YFinance':
+        interval = '5m'
+        data = fetch_historic_yfinance_data(ticker, period_start, period_end, interval)
 
-        # Fetch YFinance data arguments
-        data_period = '5d'
-        data_interval = '1m'
-
-        data = fetch_historic_yfinance_data(ticker, data_period, data_interval)
-
-    backtest_strategy(ticker, SMA_RSI_MACD_Strat(data, 40, 1, 5, 62, 36, 4, 11, 17))
+    backtest_strategy(ticker, SMA_RSI_MACD_Strat(data, 40, 1, 5, 62, 36, 4, 11, 17), True)
