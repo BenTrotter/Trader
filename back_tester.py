@@ -72,7 +72,7 @@ def backtest_strategy(data):
     trading_session.display_trades()
     trading_session.calculate_percentage_change_of_strategy()
     trading_session.calculate_average_duration()
-    plot_strategy(data, ticker, "Strategy")
+    plot_strategy(data, ticker, "Strategy", trading_session.trades)
     print(trading_session)
 
     return trading_session.percentage_change_of_strategy
