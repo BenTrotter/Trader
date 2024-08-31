@@ -7,9 +7,16 @@ from datetime import datetime
 from strategies import *
 from data_visualisation import *
 from  trading_strategy_v1 import SMA_RSI_MACD_Strat
+from alpaca.data.historical import StockHistoricalDataClient, CryptoHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest, CryptoBarsRequest
+from alpaca.data.timeframe import TimeFrame
+from dotenv import load_dotenv
+
+# If this is true, it prints the trading session class and its associated trades
+display_backtester = True
 
 
-def fetch_historical_data(ticker, period, interval):
+def fetch_historic_yfinance_data(ticker, period, interval):
     """
     Fetches historical stock data for a given ticker.
     Args:
@@ -17,9 +24,59 @@ def fetch_historical_data(ticker, period, interval):
     Returns:
         pd.DataFrame: DataFrame with historical stock data.
     """
+
     download_df = yf.download(ticker, period=period, interval=interval)
+
     download_df.reset_index(inplace=True)
+
+    # Convert the Datetime column to datetime objects
+    download_df['Datetime'] = pd.to_datetime(download_df['Datetime'])
+
     return download_df
+
+
+def fetch_historic_alpaca_data(stock, crypto, period_start, period_end, symbol_symbols, interval):
+
+    # Load environment variables from .env file
+    load_dotenv(override=True)
+
+    # Alpaca API credentials
+    ALPACA_PERSONAL_API_KEY_ID = os.getenv('ALPACA_PERSONAL_API_KEY_ID')
+    ALPACA_PERSONAL_API_SECRET_KEY = os.getenv('ALPACA_PERSONAL_API_SECRET_KEY')
+
+    # Common code for both stock and crypto
+    period_start = pd.to_datetime(period_start)
+    period_end = pd.to_datetime(period_end)
+    
+    # Choose the client and request parameters based on the type of asset
+    if stock:
+        data_client = StockHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
+        request_params = StockBarsRequest(
+            symbol_or_symbols=[symbol_symbols],
+            timeframe=interval,
+            start=period_start,
+            end=period_end
+        )
+    elif crypto:
+        data_client = CryptoHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
+        request_params = CryptoBarsRequest(
+            symbol_or_symbols=[symbol_symbols],
+            timeframe=interval,
+            start=period_start,
+            end=period_end
+        )
+    else:
+        raise ValueError("Specify either stock or crypto as True.")
+
+    # Fetch the data
+    download_data = data_client.get_crypto_bars(request_params).df if crypto else data_client.get_stock_bars(request_params).df
+
+    # Reset the index to add a sequential index column and turn the current index columns into regular columns
+    download_data.reset_index(inplace=True)
+
+    download_data.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
+
+    return download_data
 
 
 def open_trade(open_time, open_price, trade_type):
@@ -57,31 +114,48 @@ def analyse_row(trading_session, trade, row):
     return trade, trading_session
 
 
-def backtest_strategy(data):
+def backtest_strategy(ticker, data):
 
     trading_session = Trading_session(1000)
-
-    # Convert the Datetime column to datetime objects
-    data['Datetime'] = pd.to_datetime(data['Datetime'])
 
     # Iterate over DataFrame rows and populate list of Trades
     trade = None
     for index, row in data.iterrows():
         trade, trading_session = analyse_row(trading_session, trade, row)
-    
-    # if display_backtester:
-    #     trading_session.display_trades()
-    #     print(trading_session)
-    #     plot_strategy(data, ticker, "Strategy", trading_session.trades)
-    
+
     trading_session.calculate_percentage_change_of_strategy()
     trading_session.calculate_average_duration()
+    
+    if display_backtester:
+        trading_session.display_trades()
+        print(trading_session)
+        plot_strategy(data, ticker, "Strategy", trading_session.trades)
+    
     return trading_session.percentage_change_of_strategy
     
 
 if __name__ == "__main__":
-    ticker = 'AMZN'
-    data_period = "5d"
-    data_interval = "1m"
-    data = fetch_historical_data(ticker, data_period, data_interval)
-    backtest_strategy(SMA_RSI_MACD_Strat(data, 60,3, 14, 70,30, 6, 12, 5))
+    
+    data_source = 'Alpaca'
+    ticker = "AMZN"
+    
+    if data_source == 'Alpaca':
+
+        # Fetch alpaca data arguments
+        stock = True
+        crypto = False
+        period_start = "2024-01-01"
+        period_end = "2024-01-03"
+        time_frame = TimeFrame.Minute
+
+        data = fetch_historic_alpaca_data(stock, crypto, period_start, period_end, ticker, time_frame)
+
+    elif data_source == 'YFinance':
+
+        # Fetch YFinance data arguments
+        data_period = '5d'
+        data_interval = '1m'
+
+        data = fetch_historic_yfinance_data(ticker, data_period, data_interval)
+
+    backtest_strategy(ticker, SMA_RSI_MACD_Strat(data, 40, 1, 5, 62, 36, 4, 11, 17))

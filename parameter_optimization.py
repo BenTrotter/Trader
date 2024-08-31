@@ -1,5 +1,5 @@
 import optuna
-from back_tester import fetch_historical_data, backtest_strategy
+from back_tester import fetch_historic_yfinance_data, backtest_strategy
 from trading_strategy_v1 import SMA_RSI_MACD_Strat
 
 def objective(trial):
@@ -17,7 +17,7 @@ def objective(trial):
     ticker = 'AMZN'
     data_period = "5d"
     data_interval = "1m"
-    data = fetch_historical_data(ticker, data_period, data_interval)
+    data = fetch_historic_yfinance_data(ticker, data_period, data_interval)
 
     # Create strategy instance with suggested parameters
     strategy = SMA_RSI_MACD_Strat(
