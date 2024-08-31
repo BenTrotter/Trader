@@ -2,6 +2,12 @@ import optuna
 from back_tester import fetch_historic_yfinance_data, backtest_strategy
 from trading_strategy_v1 import SMA_RSI_MACD_Strat
 
+# Fetch historical data once
+ticker = 'AAPL'
+data_period = "5d"
+data_interval = "1m"
+data = fetch_historical_data(ticker, data_period, data_interval)
+
 def objective(trial):
     # Define parameter ranges for optimization
     sma_window = trial.suggest_int('sma_window', 10, 100)
@@ -21,7 +27,7 @@ def objective(trial):
 
     # Create strategy instance with suggested parameters
     strategy = SMA_RSI_MACD_Strat(
-        data, 
+        data.copy(), 
         sma_window, 
         look_back_period, 
         period, 
@@ -38,13 +44,26 @@ def objective(trial):
     # We want to maximize profit, so we return negative profit
     return -profit_percent
 
+if __name__ == "__main__":
+    # Create a study object to minimize the objective function
+    study = optuna.create_study(direction='minimize')
+    
+    # Optimize the objective function
+    study.optimize(objective, n_trials=100)  # You can adjust the number of trials
 
-study = optuna.create_study(direction='minimize')
-study.optimize(objective, n_trials=20)  # You can adjust the number of trials
+    # Print best parameters and best value
+    print("Best parameters: ", study.best_params)
+    print("Best profit (negative): ", study.best_value)
 
-print("Best parameters: ", study.best_params)
-print("Best profit (negative): ", study.best_value)
+    # Plot optimization history and parameter importances
+    import optuna.visualization
 
-optuna.visualization.plot_optimization_history(study)
+    # Plot optimization history
+    fig = optuna.visualization.plot_optimization_history(study)
+    fig.show()
 
-optuna.visualization.plot_param_importances(study)
+    # Plot parameter importances
+    fig = optuna.visualization.plot_param_importances(study)
+    fig.show()
+
+
