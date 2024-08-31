@@ -68,13 +68,14 @@ def backtest_strategy(data):
     trade = None
     for index, row in data.iterrows():
         trade, trading_session = analyse_row(trading_session, trade, row)
-        
-    trading_session.display_trades()
+    
+    # if display_backtester:
+    #     trading_session.display_trades()
+    #     print(trading_session)
+    #     plot_strategy(data, ticker, "Strategy", trading_session.trades)
+    
     trading_session.calculate_percentage_change_of_strategy()
     trading_session.calculate_average_duration()
-    plot_strategy(data, ticker, "Strategy", trading_session.trades)
-    print(trading_session)
-
     return trading_session.percentage_change_of_strategy
     
 
