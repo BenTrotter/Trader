@@ -1,6 +1,6 @@
 import optuna
 from back_tester import fetch_historic_yfinance_data, backtest_strategy
-from trading_strategy_v1 import SMA_RSI_MACD_Strat
+from trading_strategies import SMA_RSI_MACD_Strat
 
 # Fetch historical data once
 ticker = 'AAPL'

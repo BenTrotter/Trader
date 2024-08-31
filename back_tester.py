@@ -4,9 +4,8 @@ import yfinance as yf
 import os
 from trading_session import *
 from datetime import datetime
-from strategies import *
 from data_visualisation import *
-from  trading_strategy_v1 import *
+from  trading_strategies import *
 from alpaca.data.historical import StockHistoricalDataClient, CryptoHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest, CryptoBarsRequest
 from alpaca.data.timeframe import TimeFrame

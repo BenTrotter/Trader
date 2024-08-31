@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import pandas as pd
 import numpy as np  # Make sure to import numpy
 from alpaca_functions import *
-from strategies import moving_average_crossover_strategy  # Adjust 'other_file' to the actual filename
 from trading_session import *
 
 crypto = False
@@ -71,7 +70,8 @@ async def quote_data_handler(data):
 
     if(len(copy) > 1): 
 
-        growing_df = moving_average_crossover_strategy(copy, short_window=1, long_window=2)
+        # TODO: Implement growing dataframe using trading strategy v1
+        # growing_df = moving_average_crossover_strategy(copy, short_window=1, long_window=2)
 
         print("\nGrowing DataFrame:\n", growing_df.tail(2))
         print("\n")
