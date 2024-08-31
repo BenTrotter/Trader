@@ -71,4 +71,3 @@ if __name__ == "__main__":
     signal_period = study.best_params.get("signal_period")
     data = SMA_RSI_MACD_Strat(data, sma_window, look_back_period, period, overbought_condition, oversold_condition, fast_period, slow_period, signal_period)
     backtest_strategy(ticker, True, data)
-
