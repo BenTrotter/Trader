@@ -70,15 +70,40 @@ class Trading_session:
     
 
     def calculate_sharpe_ratio(self, risk_free_rate=0.01):
-        # Calculate the returns for each trade
-        returns = [trade.profit / self.starting_balance for trade in self.trades]
+        """
+        Calculate the Sharpe Ratio for the trading session.
+        
+        The Sharpe Ratio is calculated as the ratio of the excess return (returns over the risk-free rate)
+        to the standard deviation of the returns. A higher Sharpe Ratio indicates a better risk-adjusted return.
+        
+        Args:
+            risk_free_rate (float): The risk-free rate to compare against. Defaults to 0.01 (1%).
+        
+        Returns:
+            float: The Sharpe Ratio, or 0 if it cannot be calculated.
+        """
+        # Extract the profit percentages from the trades
+        returns = np.array([trade.profit_pct for trade in self.trades])
 
-        # Calculate the mean and standard deviation of returns
-        mean_return = np.mean(returns)
-        std_return = np.std(returns)
+        # Check if returns array is empty or contains only zeros
+        if returns.size == 0 or np.all(returns == 0):
+            return 0.0
 
-        # Calculate the Sharpe ratio
-        sharpe_ratio = (mean_return - risk_free_rate) / std_return if std_return != 0 else 0
+        # Calculate the mean return
+        mean_return = np.mean(returns) / 100
+
+        # Calculate the excess return over the risk-free rate
+        excess_return = mean_return - risk_free_rate
+
+        # Calculate the standard deviation of returns
+        std_dev = np.std(returns) / 100
+
+        # Handle cases where standard deviation is zero
+        if std_dev == 0:
+            return 0.0 if excess_return <= 0 else float('inf')
+
+        # Calculate and return the Sharpe Ratio
+        sharpe_ratio = excess_return / std_dev
         self.sharpe_ratio = sharpe_ratio
 
 
