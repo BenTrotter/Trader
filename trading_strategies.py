@@ -1,3 +1,4 @@
+from globals import *
 import os
 from indicator_filter import *
 from indicator_setup import *
@@ -21,10 +22,7 @@ def combined_strategy(df, filter_func, setup_func, trigger_func, filter_params={
 
 
 if __name__ == "__main__":
-    ticker="AAPL"
-    data_period = "5d"
-    data_interval = "1m"
-    df = fetch_historic_yfinance_data(ticker, data_period, data_interval)
+    df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
     df = (combined_strategy(df, 
                             filter_func=generate_SMA_filter_signal,
                             setup_func=generate_RSI_setup_signal,

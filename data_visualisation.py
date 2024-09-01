@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+from globals import *
 
 
-def plot_strategy(data, ticker, strategy_name, trades):
+def plot_strategy(data, strategy_name, trades):
     """
     Plots the stock price, signals for buy/sell, and trade points.
 

@@ -1,5 +1,6 @@
 import pandas as pd
 from data_fetch import *
+from globals import *
 
 def generate_SMA_filter_signal(df, sma_window, look_back_period):
     """
@@ -23,11 +24,7 @@ def generate_SMA_filter_signal(df, sma_window, look_back_period):
 
 
 def test_indicator():
-    ticker = "AMZN"
-    period_start = '2024-08-28'
-    period_end = '2024-08-29'
-    interval = '5m'
-    df = fetch_historic_yfinance_data(ticker, period_start, period_end, interval)
+    df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
     print(generate_SMA_filter_signal(df, 10, 5))
 
 

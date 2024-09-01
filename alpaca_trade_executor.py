@@ -5,8 +5,7 @@ import pandas as pd
 import numpy as np  # Make sure to import numpy
 from alpaca_functions import *
 from trading_session import *
-
-crypto = False
+from globals import *
 
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -21,10 +20,10 @@ print(SECRET_KEY)
 # Initialize the WebSocket client
 if(crypto):
     wss_client = CryptoDataStream(API_KEY, SECRET_KEY)
-    ticker = "BTC/USD"
-else:
+    ticker = crypto_ticker
+elif(stock):
     wss_client = StockDataStream(API_KEY, SECRET_KEY)
-    ticker = "SPY"
+    ticker = ticker
 
 # Initialize an empty DataFrame to store incoming bar data
 columns = ['symbol', 'timestamp', 'Open', 'High', 'Low', 'Close', 'Volume', 'trade_count', 'vwap']

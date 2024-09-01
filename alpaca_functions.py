@@ -4,19 +4,18 @@ from alpaca.trading.enums import OrderSide, TimeInForce
 import os
 from dotenv import load_dotenv
 from trading_session import *
+from globals import *
 
 # Load environment variables from .env file
 load_dotenv(override=True)
 
-crypto = False
-
 # Initialize the WebSocket client
 if(crypto):
     time_in_force = TimeInForce.GTC
-    ticker = "BTC/USD"
-else:
+    ticker = crypto_ticker
+elif(stock):
     time_in_force = TimeInForce.DAY
-    ticker = "SPY"
+    ticker = ticker
 
 # Alpaca API credentials
 API_KEY = os.getenv('ALPACA_API_KEY')
@@ -25,7 +24,6 @@ SECRET_KEY = os.getenv('ALPACA_SECRET_KEY')
 
 # paper=True enables paper trading
 trading_client = TradingClient(API_KEY, SECRET_KEY, paper=True)
-
 
 
 def prepare_open_long_order(ticker, quantity, take_profit_price, stop_loss_price):
@@ -71,7 +69,7 @@ def open_trade(open_time, open_price, trade_type):
     trade = Trade(
         open_time=open_time,
         open_price=open_price,
-        quantity=1,
+        quantity=quantity,
         long=trade_type,
         short= not trade_type,
         take_profit_pct=0.04,
@@ -79,10 +77,10 @@ def open_trade(open_time, open_price, trade_type):
 
     if(trade_type):
         print("Opening a long position")
-        order = prepare_open_long_order(ticker, 1, trade.take_profit_price, trade.stop_loss_price)
+        order = prepare_open_long_order(ticker, quantity, trade.take_profit_price, trade.stop_loss_price)
     else:
         print("Opening a short position")
-        order = prepare_open_short_order(ticker, 1, trade.take_profit_price, trade.stop_loss_price)
+        order = prepare_open_short_order(ticker, quantity, trade.take_profit_price, trade.stop_loss_price)
 
     send_order(order)
 

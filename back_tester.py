@@ -7,6 +7,7 @@ from indicator_filter import *
 from indicator_setup import *
 from indicator_trigger import *
 from data_fetch import *
+from globals import *
 
 
 def open_trade(open_time, open_price, trade_type):
@@ -17,7 +18,7 @@ def open_trade(open_time, open_price, trade_type):
     return Trade(
         open_time=open_time,
         open_price=open_price,
-        quantity=1,
+        quantity=quantity,
         long=trade_type,
         short= not trade_type,
         take_profit_pct=0.04,
@@ -44,9 +45,9 @@ def analyse_row(trading_session, trade, row):
     return trade, trading_session
 
 
-def backtest_strategy(ticker, display_backtester, data):
+def backtest_strategy(display_backtester, data):
 
-    trading_session = Trading_session(1000)
+    trading_session = Trading_session(starting_balance)
 
     # Iterate over DataFrame rows and populate list of Trades
     trade = None
@@ -59,37 +60,24 @@ def backtest_strategy(ticker, display_backtester, data):
     if display_backtester:
         trading_session.display_trades()
         print(trading_session)
-        plot_strategy(data, ticker, "Strategy", trading_session.trades)
+        plot_strategy(data, "Strategy", trading_session.trades)
     
     return trading_session.percentage_change_of_strategy
     
 
 if __name__ == "__main__":
     
-    data_source = 'YFinance'
-    ticker = "AMZN"
-    period_start = '2024-08-28'
-    period_end = '2024-08-29'
+    if alpaca_data_source:
+        data = fetch_historic_alpaca_data(training_period_start, training_period_end, alpaca_interval)
 
-    if data_source == 'Alpaca':
+    elif yfinance_data_source:
+        data = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
 
-        # Fetch alpaca data arguments
-        stock = True
-        crypto = False
-        time_frame = TimeFrame.Minute
-
-        data = fetch_historic_alpaca_data(stock, crypto, period_start, period_end, ticker, time_frame)
-
-    elif data_source == 'YFinance':
-        interval = '5m'
-        data = fetch_historic_yfinance_data(ticker, period_start, period_end, interval)
-
-    backtest_strategy(ticker,
-                      True,
+    backtest_strategy(True,
                       combined_strategy(data, 
                             filter_func=generate_SMA_filter_signal,
                             setup_func=generate_RSI_setup_signal,
                             trigger_func=generate_MACD_trigger_signal,
-                            filter_params={'sma_window': 50, 'look_back_period': 3},
-                            setup_params={'period': 14, 'overbought_condition': 70, 'oversold_condition': 30},
+                            filter_params={'sma_window': 5, 'look_back_period': 3},
+                            setup_params={'period': 14, 'overbought_condition': 60, 'oversold_condition': 40},
                             trigger_params={'fast_period': 12, 'slow_period': 26, 'signal_period': 9}))

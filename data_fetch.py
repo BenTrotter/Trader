@@ -5,32 +5,39 @@ import pandas as pd
 import yfinance as yf
 import os
 from dotenv import load_dotenv
+from globals import *
 
 
-def fetch_historic_yfinance_data(ticker, start_date, end_date, interval):
+def fetch_historic_yfinance_data(start_date, end_date, interval):
     """
     Fetches historical stock data for a given ticker between two dates.
+    
     Args:
         ticker (str): The stock ticker symbol.
         start_date (str): The start date for data retrieval (format 'YYYY-MM-DD').
         end_date (str): The end date for data retrieval (format 'YYYY-MM-DD').
         interval (str): The data interval (e.g., '1d', '1m', '5m').
+        
     Returns:
         pd.DataFrame: DataFrame with historical stock data.
     """
-
+    
     # Fetch data between start_date and end_date
     download_df = yf.download(ticker, start=start_date, end=end_date, interval=interval)
 
     download_df.reset_index(inplace=True)
-
-    # Convert the Datetime column to datetime objects
-    download_df['Datetime'] = pd.to_datetime(download_df['Datetime'])
-
+    
+    # Check for 'Date' or 'Datetime' column and handle accordingly
+    if 'Date' in download_df.columns:
+        download_df['Date'] = pd.to_datetime(download_df['Date'])
+        download_df.rename(columns={'Date': 'Datetime'}, inplace=True)
+    elif 'Datetime' in download_df.columns:
+        download_df['Datetime'] = pd.to_datetime(download_df['Datetime'])
+    
     return download_df
 
 
-def fetch_historic_alpaca_data(stock, crypto, period_start, period_end, symbol_symbols, interval):
+def fetch_historic_alpaca_data(period_start, period_end, interval):
 
     # Load environment variables from .env file
     load_dotenv(override=True)
@@ -47,7 +54,7 @@ def fetch_historic_alpaca_data(stock, crypto, period_start, period_end, symbol_s
     if stock:
         data_client = StockHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
         request_params = StockBarsRequest(
-            symbol_or_symbols=[symbol_symbols],
+            symbol_or_symbols=ticker,
             timeframe=interval,
             start=period_start,
             end=period_end
@@ -55,7 +62,7 @@ def fetch_historic_alpaca_data(stock, crypto, period_start, period_end, symbol_s
     elif crypto:
         data_client = CryptoHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
         request_params = CryptoBarsRequest(
-            symbol_or_symbols=[symbol_symbols],
+            symbol_or_symbols=crypto_ticker,
             timeframe=interval,
             start=period_start,
             end=period_end

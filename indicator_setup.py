@@ -37,11 +37,7 @@ def generate_RSI_setup_signal(df, period, overbought_condition, oversold_conditi
 
 
 def test_indicator():
-    ticker = "AMZN"
-    period_start = '2024-08-28'
-    period_end = '2024-08-29'
-    interval = '5m'
-    df = fetch_historic_yfinance_data(ticker, period_start, period_end, interval)
+    df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
     print(generate_RSI_setup_signal(df, 10, 5))
 
 
