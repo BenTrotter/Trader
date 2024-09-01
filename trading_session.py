@@ -10,6 +10,7 @@ class Trading_session:
         self.trades= []
         self.average_duration_of_trade = ""
         self.percentage_change_of_strategy = 0.0
+        self.number_of_winning_trades = 0
 
 
     def add_trade(self, trade):
@@ -51,10 +52,19 @@ class Trading_session:
         self.average_duration_of_trade = f"{hours:02}:{minutes:02}:{seconds:02}"
 
 
+    def calculate_number_of_winning_trades(self):
+        count = 0
+        for tr in self.trades:
+            if tr.profit > 0:
+                count += 1
+        self.number_of_winning_trades = count
+
+
     def __str__(self) -> str:
         return (f"\nStarting Balance: ${self.starting_balance:.2f}\n"
                 f"Current Balance: ${self.current_balance:.2f}\n"
                 f"Number of Trades: {len(self.trades)}\n"
+                f"Number of Winning Trades: {self.number_of_winning_trades}\n"
                 f"Average Trade Duration: {self.average_duration_of_trade}\n"
                 f"Strategy percentage change: {self.percentage_change_of_strategy:.2f}%\n")
 

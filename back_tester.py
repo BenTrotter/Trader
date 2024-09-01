@@ -60,6 +60,7 @@ def backtest_strategy(display_backtester, data):
 
     trading_session.calculate_percentage_change_of_strategy()
     trading_session.calculate_average_duration()
+    trading_session.calculate_number_of_winning_trades()
     
     if display_backtester:
         trading_session.display_trades()
@@ -67,7 +68,8 @@ def backtest_strategy(display_backtester, data):
         print(f"Buy and hold: {buy_and_hold}")
         plot_strategy(data, "Strategy", trading_session.trades)
     
-    return trading_session.percentage_change_of_strategy
+    # return trading_session.percentage_change_of_strategy
+    return trading_session.number_of_winning_trades
     
 
 if __name__ == "__main__":

@@ -73,8 +73,6 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
     # Fetch the data
     download_data = data_client.get_crypto_bars(request_params).df if crypto else data_client.get_stock_bars(request_params).df
 
-    print(download_data)
-
     # Reset the index to add a sequential index column and turn the current index columns into regular columns
     download_data.reset_index(inplace=True)
 

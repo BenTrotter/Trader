@@ -27,4 +27,4 @@ yfinance_interval = '5m'
 alpaca_interval = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-number_of_trials = 50
+number_of_trials = 40
