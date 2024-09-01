@@ -59,10 +59,10 @@ def objective(trial):
     )
 
     # Backtest strategy
-    profit_percent, number_of_winning_trades = backtest_strategy(False, strategy_df)
+    objective_1, objective_2 = backtest_strategy(False, strategy_df)
     
     # We want to maximize profit, so we return negative profit
-    return profit_percent, number_of_winning_trades
+    return objective_1, objective_2
 
 
 import optuna
