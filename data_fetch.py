@@ -79,3 +79,24 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
     download_data.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
 
     return download_data
+
+
+def fetch_data(data_window_type):
+
+    if alpaca_data_source:
+
+        if data_window_type == 'Training':
+            data = fetch_historic_alpaca_data(training_period_start, training_period_end, alpaca_interval)
+
+        elif data_window_type == 'Unseen':
+            data = fetch_historic_alpaca_data(unseen_period_start, unseen_period_start, alpaca_interval)
+
+    elif yfinance_data_source:
+
+        if data_window_type == 'Training': 
+            data = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+
+        elif data_window_type == 'Unseen':
+            data = fetch_historic_yfinance_data(unseen_period_start, unseen_period_end, yfinance_interval)
+
+    return data

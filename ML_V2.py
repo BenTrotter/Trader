@@ -67,7 +67,7 @@ def objective(trial):
 
 if __name__ == "__main__":
 
-    df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+    df = fetch_data('Training')
 
     # Create a study object to minimize the objective function
     study = optuna.create_study(direction='maximize')
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     
     backtest_strategy(True, best_strategy_df)
 
-    unseen_data = fetch_historic_yfinance_data(unseen_period_start, unseen_period_end, yfinance_interval)
+    unseen_data = fetch_data('Unseen')
 
     unseen_strategy_df = combined_strategy(
         unseen_data, 
