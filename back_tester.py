@@ -70,26 +70,8 @@ def backtest_strategy(display_backtester, data):
         print(f"Buy and hold: {buy_and_hold}")
         plot_strategy(data, "Strategy", trading_session.trades)
     
-    # return trading_session.percentage_change_of_strategy
-    return get_objectives(trading_session)
-    
+    return trading_session.get_objectives()
 
-def get_objectives(trading_session):
-    results = []  
-    
-    if profit_objective:
-        results.append(trading_session.percentage_change_of_strategy)
-    
-    if num_winning_trades_objectice:
-        results.append(trading_session.number_of_winning_trades)
-    
-    if sharpe_ratio_objective:
-        results.append(trading_session.sharpe_ratio)
-    
-    if normalised_profit:
-        results.append(trading_session.normalized_profit)
-    
-    return tuple(results)
 
 if __name__ == "__main__":
     

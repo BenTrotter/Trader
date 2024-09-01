@@ -1,3 +1,4 @@
+from globals import *
 from datetime import datetime
 from tabulate import tabulate
 import numpy as np
@@ -69,7 +70,7 @@ class Trading_session:
         self.normalized_profit = normalized_profit
     
 
-    def calculate_sharpe_ratio(self, risk_free_rate=0.01):
+    def calculate_sharpe_ratio(self):
         """
         Calculate the Sharpe Ratio for the trading session.
         
@@ -105,6 +106,24 @@ class Trading_session:
         # Calculate and return the Sharpe Ratio
         sharpe_ratio = excess_return / std_dev
         self.sharpe_ratio = sharpe_ratio
+
+    
+    def get_objectives(self):
+        results = []  
+        
+        if profit_objective:
+            results.append(self.percentage_change_of_strategy)
+        
+        if num_winning_trades_objectice:
+            results.append(self.number_of_winning_trades)
+        
+        if sharpe_ratio_objective:
+            results.append(self.sharpe_ratio)
+        
+        if normalised_profit:
+            results.append(self.normalized_profit)
+        
+        return tuple(results)
 
 
     def __str__(self) -> str:

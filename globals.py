@@ -36,3 +36,6 @@ profit_objective = True
 num_winning_trades_objectice = False
 sharpe_ratio_objective = True
 normalised_profit = False
+
+
+risk_free_rate = 0.01
