@@ -47,6 +47,10 @@ def analyse_row(trading_session, trade, row):
 
 def backtest_strategy(display_backtester, data):
 
+    open_price_of_window = data["Open"].iloc[0]
+    closing_price_of_window = data["Close"].iloc[-1]
+    buy_and_hold = ((closing_price_of_window - open_price_of_window) / open_price_of_window) * 100
+
     trading_session = Trading_session(starting_balance)
 
     # Iterate over DataFrame rows and populate list of Trades
@@ -60,6 +64,7 @@ def backtest_strategy(display_backtester, data):
     if display_backtester:
         trading_session.display_trades()
         print(trading_session)
+        print(f"Buy and hold: {buy_and_hold}")
         plot_strategy(data, "Strategy", trading_session.trades)
     
     return trading_session.percentage_change_of_strategy
