@@ -73,6 +73,8 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
     # Fetch the data
     download_data = data_client.get_crypto_bars(request_params).df if crypto else data_client.get_stock_bars(request_params).df
 
+    print(download_data)
+
     # Reset the index to add a sequential index column and turn the current index columns into regular columns
     download_data.reset_index(inplace=True)
 
@@ -89,7 +91,7 @@ def fetch_data(data_window_type):
             data = fetch_historic_alpaca_data(training_period_start, training_period_end, alpaca_interval)
 
         elif data_window_type == 'Unseen':
-            data = fetch_historic_alpaca_data(unseen_period_start, unseen_period_start, alpaca_interval)
+            data = fetch_historic_alpaca_data(unseen_period_start, unseen_period_end, alpaca_interval)
 
     elif yfinance_data_source:
 
@@ -100,3 +102,8 @@ def fetch_data(data_window_type):
             data = fetch_historic_yfinance_data(unseen_period_start, unseen_period_end, yfinance_interval)
 
     return data
+
+
+if __name__ == "__main__":
+    df = fetch_data('Unseen')
+    print(df)

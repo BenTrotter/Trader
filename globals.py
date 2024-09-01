@@ -19,12 +19,12 @@ alpaca_data_source = True
 # Choose dates
 training_period_start = '2024-08-20'
 training_period_end = '2024-08-25'
-unseen_period_start = '2024-08-26'
-unseen_period_end = '2024-08-27'
+unseen_period_start = '2024-08-25'
+unseen_period_end = '2024-08-26'
 
 # Choose interval
 yfinance_interval = '5m'
 alpaca_interval = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-number_of_trials = 400
+number_of_trials = 50
