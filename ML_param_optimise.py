@@ -1,7 +1,7 @@
 from globals import *
 import optuna
 from back_tester import fetch_historic_yfinance_data, backtest_strategy
-from trading_strategies import combined_strategy
+from combined_strategy import combined_strategy
 from indicator_filter import *
 from indicator_setup import *
 from indicator_trigger import *

@@ -33,35 +33,3 @@ if __name__ == "__main__":
     signal_columns = ['Datetime', 'Filter_Signal', 'Setup_Signal', 'Trigger_Signal', 'Combined_Signal', 'Close']
     print(df[signal_columns])
     df[signal_columns].to_csv(os.path.abspath(os.getcwd())+'/'+ticker+'.csv')
-
-
-
-
-
-
-
-
-# # Stragey with filter, setup and trigger
-# def SMA_RSI_MACD_Strat(df, 
-#                        sma_window,
-#                        look_back_period, 
-#                        period, 
-#                        overbought_condition, 
-#                        oversold_condition,
-#                        fast_period, 
-#                        slow_period, 
-#                        signal_period):
-    
-#     generate_SMA_filter_signal(df, sma_window, look_back_period)
-#     generate_RSI_setup_signal(df, period, overbought_condition, oversold_condition)
-#     generate_MACD_trigger_signal(df, fast_period, slow_period, signal_period)
-
-#     df.dropna(inplace=True)
-
-#     # Assuming your DataFrame is named df
-#     df['Combined_Signal'] = df[['Filter_Signal', 'Setup_Signal', 'Trigger_Signal']].apply(
-#         lambda row: 1 if all(row == 1) else (-1 if all(row == -1) else 0),
-#         axis=1
-#     )
-
-#     return df    

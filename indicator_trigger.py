@@ -31,9 +31,33 @@ def generate_MACD_trigger_signal(df, fast_period, slow_period, signal_period):
     return df
 
 
+def generate_MA_crossover_trigger_signal(df, short_window, long_window):
+    """
+    Moving Average Crossover trigger that identifies potential buy/sell signals.
+    
+    df: DataFrame containing the trading data.
+    short_window: Number of periods for the short-term moving average.
+    long_window: Number of periods for the long-term moving average.
+    
+    Returns: DataFrame with the 'Trigger_Signal' column added.
+    """
+    df['MA_Short'] = df['Close'].rolling(window=short_window).mean()
+    df['MA_Long'] = df['Close'].rolling(window=long_window).mean()
+
+    df['Trigger_Signal'] = 0  # Initialize with neutral
+
+    # Buy signal when short-term MA crosses above long-term MA
+    df.loc[(df['MA_Short'] > df['MA_Long']) & (df['MA_Short'].shift(1) <= df['MA_Long'].shift(1)), 'Trigger_Signal'] = 1
+    
+    # Sell signal when short-term MA crosses below long-term MA
+    df.loc[(df['MA_Short'] < df['MA_Long']) & (df['MA_Short'].shift(1) >= df['MA_Long'].shift(1)), 'Trigger_Signal'] = -1
+    
+    return df
+
+
 def test_indicator():
     df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
-    print(generate_MACD_trigger_signal(df, 10, 5))
+    print(generate_MA_crossover_trigger_signal(df, 5, 20))
 
 
 if __name__ == "__main__":

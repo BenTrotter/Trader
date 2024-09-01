@@ -36,9 +36,34 @@ def generate_RSI_setup_signal(df, period, overbought_condition, oversold_conditi
     return df
 
 
+def generate_Stochastic_setup_signal(df, k_period, d_period, stochastic_overbought, stochastic_oversold):
+    """
+    Stochastic Oscillator setup that identifies overbought/oversold conditions.
+    
+    df: DataFrame containing the trading data.
+    k_period: Number of periods for %K line.
+    d_period: Number of periods for %D line (smoothed %K).
+    overbought: Threshold above which the asset is considered overbought.
+    oversold: Threshold below which the asset is considered oversold.
+    
+    Returns: DataFrame with the 'Setup_Signal' column added.
+    """
+    df['L14'] = df['Low'].rolling(window=k_period).min()
+    df['H14'] = df['High'].rolling(window=k_period).max()
+    df['%K'] = 100 * ((df['Close'] - df['L14']) / (df['H14'] - df['L14']))
+    df['%D'] = df['%K'].rolling(window=d_period).mean()
+
+    df['Setup_Signal'] = 0  # Initialize with neutral
+
+    df.loc[df['%D'] > stochastic_overbought, 'Setup_Signal'] = -1  # Sell signal
+    df.loc[df['%D'] < stochastic_oversold, 'Setup_Signal'] = 1    # Buy signal
+    
+    return df
+
+
 def test_indicator():
     df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
-    print(generate_RSI_setup_signal(df, 10, 5))
+    print(generate_Stochastic_setup_signal(df, k_period=14, d_period=3, stochastic_overbought=60, stochastic_oversold=40))
 
 
 if __name__ == "__main__":

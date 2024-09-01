@@ -23,9 +23,31 @@ def generate_SMA_filter_signal(df, sma_window, look_back_period):
     return df
 
 
+def generate_BollingerBands_filter_signal(df, bollinger_window, num_std_dev):
+    """
+    Bollinger Bands filter that identifies potential buy/sell zones.
+    
+    df: DataFrame containing the trading data.
+    window: Number of periods for moving average and standard deviation.
+    num_std_dev: Number of standard deviations to set the upper and lower bands.
+    
+    Returns: DataFrame with the 'Filter_Signal' column added.
+    """
+    df['MA'] = df['Close'].rolling(window=bollinger_window).mean()
+    df['BB_Upper'] = df['MA'] + num_std_dev * df['Close'].rolling(window=bollinger_window).std()
+    df['BB_Lower'] = df['MA'] - num_std_dev * df['Close'].rolling(window=bollinger_window).std()
+
+    df['Filter_Signal'] = 0  # Initialize with neutral
+
+    df.loc[df['Close'] > df['BB_Upper'], 'Filter_Signal'] = -1  # Sell signal when price is above upper band
+    df.loc[df['Close'] < df['BB_Lower'], 'Filter_Signal'] = 1   # Buy signal when price is below lower band
+    
+    return df
+
+
 def test_indicator():
     df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
-    print(generate_SMA_filter_signal(df, 10, 5))
+    print(generate_BollingerBands_filter_signal(df, 10, 0.5))
 
 
 if __name__ == "__main__":

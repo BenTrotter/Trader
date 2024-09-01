@@ -1,7 +1,7 @@
 from globals import *
 import optuna
 from back_tester import fetch_historic_yfinance_data, backtest_strategy
-from trading_strategies import combined_strategy
+from combined_strategy import combined_strategy
 from indicator_filter import *
 from indicator_setup import *
 from indicator_trigger import *
@@ -62,7 +62,7 @@ def objective(trial):
     profit_percent = backtest_strategy(False, strategy_df)
     
     # We want to maximize profit, so we return negative profit
-    return -profit_percent
+    return profit_percent
 
 
 if __name__ == "__main__":
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
 
     # Create a study object to minimize the objective function
-    study = optuna.create_study(direction='minimize')
+    study = optuna.create_study(direction='maximize')
     
     # Optimize the objective function
     study.optimize(objective, n_trials=number_of_trials)  # You can adjust the number of trials
@@ -99,16 +99,17 @@ if __name__ == "__main__":
     best_setup_func = functions_info['setup_functions'][best_setup_func_name]['function']
     best_trigger_func = functions_info['trigger_functions'][best_trigger_func_name]['function']
 
-    best_filter_params = {k.split('_', 2)[2]: v for k, v in study.best_params.items() if k.startswith('filter_') and len(k.split('_', 2)) > 2}
-    best_setup_params = {k.split('_', 2)[2]: v for k, v in study.best_params.items() if k.startswith('setup_') and len(k.split('_', 2)) > 2}
-    best_trigger_params = {k.split('_', 2)[2]: v for k, v in study.best_params.items() if k.startswith('trigger_') and len(k.split('_', 2)) > 2}
+    # Extract best parameters, removing the function prefixes but keeping parameter names intact
+    best_filter_params = {k.replace(f'filter_{best_filter_func_name}_', ''): v for k, v in study.best_params.items() if k.startswith(f'filter_{best_filter_func_name}_')}
+    best_setup_params = {k.replace(f'setup_{best_setup_func_name}_', ''): v for k, v in study.best_params.items() if k.startswith(f'setup_{best_setup_func_name}_')}
+    best_trigger_params = {k.replace(f'trigger_{best_trigger_func_name}_', ''): v for k, v in study.best_params.items() if k.startswith(f'trigger_{best_trigger_func_name}_')}
 
-    # Print the separated parameters
+    # Print the separated parameters to confirm correct extraction
     print("Best filter parameters: ", best_filter_params)
     print("Best setup parameters: ", best_setup_params)
     print("Best trigger parameters: ", best_trigger_params)
-    
-    # Re-run with the best parameters
+
+    # Re-run with the best parameters to see how it performed
     best_strategy_df = combined_strategy(
         df.copy(), 
         best_filter_func, 
@@ -118,5 +119,19 @@ if __name__ == "__main__":
         setup_params=best_setup_params, 
         trigger_params=best_trigger_params
     )
+    
     backtest_strategy(True, best_strategy_df)
 
+    unseen_data = fetch_historic_yfinance_data(unseen_period_start, unseen_period_end, yfinance_interval)
+
+    unseen_strategy_df = combined_strategy(
+        unseen_data, 
+        best_filter_func, 
+        best_setup_func, 
+        best_trigger_func, 
+        filter_params=best_filter_params, 
+        setup_params=best_setup_params, 
+        trigger_params=best_trigger_params
+    )
+
+    backtest_strategy(True, unseen_strategy_df)
