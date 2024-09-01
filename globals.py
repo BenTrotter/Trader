@@ -27,4 +27,12 @@ yfinance_interval = '5m'
 alpaca_interval = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-number_of_trials = 40
+number_of_trials = 100
+
+
+# Objectives - Only two can be chosen at the moment
+multi_objective = True
+profit_objective = True
+num_winning_trades_objectice = True
+sharpe_ratio_objective = False
+normalised_profit = False

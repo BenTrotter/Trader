@@ -69,8 +69,25 @@ def backtest_strategy(display_backtester, data):
         plot_strategy(data, "Strategy", trading_session.trades)
     
     # return trading_session.percentage_change_of_strategy
-    return trading_session.number_of_winning_trades
+    return get_objectives(trading_session)
     
+
+def get_objectives(trading_session):
+    results = []  # Initialize an empty list to store results
+    # Simulate getting values for each objective
+    if profit_objective:
+        results.append(trading_session.percentage_change_of_strategy)
+    
+    if num_winning_trades_objectice:
+        results.append(trading_session.number_of_winning_trades)
+    
+    if sharpe_ratio_objective:
+        results.append("Implement")
+    
+    if normalised_profit:
+        results.append("Implement")
+    
+    return tuple(results)
 
 if __name__ == "__main__":
     

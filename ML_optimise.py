@@ -59,55 +59,77 @@ def objective(trial):
     )
 
     # Backtest strategy
-    profit_percent = backtest_strategy(False, strategy_df)
+    profit_percent, number_of_winning_trades = backtest_strategy(False, strategy_df)
     
     # We want to maximize profit, so we return negative profit
-    return profit_percent
+    return profit_percent, number_of_winning_trades
 
+
+import optuna
+import optuna.visualization as vis
 
 if __name__ == "__main__":
 
     df = fetch_data('Training')
 
-    # Create a study object to minimize the objective function
-    study = optuna.create_study(direction='maximize')
+    # Create a study object depending on the optimization type
+    if multi_objective:
+        study = optuna.create_study(directions=['maximize', 'maximize'])
+    else:
+        study = optuna.create_study(direction='maximize')
     
     # Optimize the objective function
-    study.optimize(objective, n_trials=number_of_trials)  # You can adjust the number of trials
+    study.optimize(objective, n_trials=number_of_trials)
 
-    # Print best parameters and best value
-    print("Best parameters: ", study.best_params)
-    print("Best profit (negative): ", study.best_value)
+    if multi_objective:
+        # Handle multi-objective case
+        print("Pareto front trials:")
+        for trial in study.best_trials:
+            print(f"Trial #{trial.number}: Values = {trial.values}, Params = {trial.params}")
 
-    # Plot optimization history and parameter importances
-    import optuna.visualization
+        # Plot Pareto front
+        fig = vis.plot_pareto_front(study)
+        fig.show()
 
-    # Plot optimization history
-    fig = optuna.visualization.plot_optimization_history(study)
-    fig.show()
+        # Let's assume we choose the first trial on the Pareto front as the "best" for demonstration
+        best_trial = study.best_trials[0]
+        best_params = best_trial.params
+    else:
+        # Handle single-objective case
+        print("Best parameters: ", study.best_params)
+        print("Best profit (maximized): ", study.best_value)
 
-    # # Plot parameter importances
-    # fig = optuna.visualization.plot_param_importances(study)
-    # fig.show()
+        # Plot optimization history and parameter importances
+        fig = vis.plot_optimization_history(study)
+        fig.show()
 
-    # Retrieve best parameters and re-run the best strategy with visualization enabled
-    best_filter_func_name = study.best_params['filter_func']
-    best_setup_func_name = study.best_params['setup_func']
-    best_trigger_func_name = study.best_params['trigger_func']
+        fig = vis.plot_param_importances(study)
+        fig.show()
+
+        best_params = study.best_params
+
+    # Retrieve best function names and parameters
+    best_filter_func_name = best_params['filter_func']
+    best_setup_func_name = best_params['setup_func']
+    best_trigger_func_name = best_params['trigger_func']
 
     best_filter_func = functions_info['filter_functions'][best_filter_func_name]['function']
     best_setup_func = functions_info['setup_functions'][best_setup_func_name]['function']
     best_trigger_func = functions_info['trigger_functions'][best_trigger_func_name]['function']
 
     # Extract best parameters, removing the function prefixes but keeping parameter names intact
-    best_filter_params = {k.replace(f'filter_{best_filter_func_name}_', ''): v for k, v in study.best_params.items() if k.startswith(f'filter_{best_filter_func_name}_')}
-    best_setup_params = {k.replace(f'setup_{best_setup_func_name}_', ''): v for k, v in study.best_params.items() if k.startswith(f'setup_{best_setup_func_name}_')}
-    best_trigger_params = {k.replace(f'trigger_{best_trigger_func_name}_', ''): v for k, v in study.best_params.items() if k.startswith(f'trigger_{best_trigger_func_name}_')}
+    best_filter_params = {k.replace(f'filter_{best_filter_func_name}_', ''): v 
+                          for k, v in best_params.items() if k.startswith(f'filter_{best_filter_func_name}_')}
+    best_setup_params = {k.replace(f'setup_{best_setup_func_name}_', ''): v 
+                         for k, v in best_params.items() if k.startswith(f'setup_{best_setup_func_name}_')}
+    best_trigger_params = {k.replace(f'trigger_{best_trigger_func_name}_', ''): v 
+                           for k, v in best_params.items() if k.startswith(f'trigger_{best_trigger_func_name}_')}
 
     # Print the separated parameters to confirm correct extraction
     print("Best filter parameters: ", best_filter_params)
     print("Best setup parameters: ", best_setup_params)
     print("Best trigger parameters: ", best_trigger_params)
+
 
     # Re-run with the best parameters to see how it performed
     best_strategy_df = combined_strategy(
