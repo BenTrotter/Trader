@@ -59,7 +59,7 @@ class Trading_session:
     def calculate_number_of_winning_trades(self):
         count = 0
         for tr in self.trades:
-            if tr.profit > 0:
+            if tr.profit > winning_trades_param:
                 count += 1
         self.number_of_winning_trades = count
 

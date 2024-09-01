@@ -17,25 +17,26 @@ yfinance_data_source = False
 alpaca_data_source = True
 
 # Choose dates
-training_period_start = '2024-08-20'
+training_period_start = '2024-08-01'
 training_period_end = '2024-08-25'
 unseen_period_start = '2024-08-25'
-unseen_period_end = '2024-08-26'
+unseen_period_end = '2024-08-30'
 
 # Choose interval
 yfinance_interval = '5m'
 alpaca_interval = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-number_of_trials = 100
+number_of_trials = 75
 
 
 # Objectives - Only two can be chosen at the moment
 multi_objective = True
 profit_objective = True
-num_winning_trades_objectice = False
-sharpe_ratio_objective = True
+num_winning_trades_objectice = True
+sharpe_ratio_objective = False
 normalised_profit = False
 
-
+# Performance metric
 risk_free_rate = 0.01
+winning_trades_param = 2.5
