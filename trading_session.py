@@ -1,5 +1,6 @@
 from datetime import datetime
 from tabulate import tabulate
+import numpy as np
 
 class Trading_session:
     def __init__(self, 
@@ -60,13 +61,34 @@ class Trading_session:
         self.number_of_winning_trades = count
 
 
+    def calculate_normalized_profit(self):
+        # Normalized profit can be calculated as total profit divided by the starting balance
+        normalized_profit = (self.current_balance - self.starting_balance) / self.starting_balance
+        return normalized_profit
+    
+
+    def calculate_sharpe_ratio(self, risk_free_rate=0.01):
+        # Calculate the returns for each trade
+        returns = [trade.profit / self.starting_balance for trade in self.trades]
+
+        # Calculate the mean and standard deviation of returns
+        mean_return = np.mean(returns)
+        std_return = np.std(returns)
+
+        # Calculate the Sharpe ratio
+        sharpe_ratio = (mean_return - risk_free_rate) / std_return if std_return != 0 else 0
+        return sharpe_ratio
+
+
     def __str__(self) -> str:
         return (f"\nStarting Balance: ${self.starting_balance:.2f}\n"
                 f"Current Balance: ${self.current_balance:.2f}\n"
                 f"Number of Trades: {len(self.trades)}\n"
                 f"Number of Winning Trades: {self.number_of_winning_trades}\n"
                 f"Average Trade Duration: {self.average_duration_of_trade}\n"
-                f"Strategy percentage change: {self.percentage_change_of_strategy:.2f}%\n")
+                f"Strategy percentage change: {self.percentage_change_of_strategy:.2f}%\n"
+                f"Normalized Profit: {self.calculate_normalized_profit():.2f}%\n"
+                f"Sharpe Ratio: {self.calculate_sharpe_ratio():.2f}%\n")
 
 
 class Trade(Trading_session):
