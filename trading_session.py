@@ -12,6 +12,8 @@ class Trading_session:
         self.average_duration_of_trade = ""
         self.percentage_change_of_strategy = 0.0
         self.number_of_winning_trades = 0
+        self.normalized_profit = 0.0
+        self.sharpe_ratio = 0.0
 
 
     def add_trade(self, trade):
@@ -64,7 +66,7 @@ class Trading_session:
     def calculate_normalized_profit(self):
         # Normalized profit can be calculated as total profit divided by the starting balance
         normalized_profit = (self.current_balance - self.starting_balance) / self.starting_balance
-        return normalized_profit
+        self.normalized_profit = normalized_profit
     
 
     def calculate_sharpe_ratio(self, risk_free_rate=0.01):
@@ -77,7 +79,7 @@ class Trading_session:
 
         # Calculate the Sharpe ratio
         sharpe_ratio = (mean_return - risk_free_rate) / std_return if std_return != 0 else 0
-        return sharpe_ratio
+        self.sharpe_ratio = sharpe_ratio
 
 
     def __str__(self) -> str:
@@ -87,8 +89,8 @@ class Trading_session:
                 f"Number of Winning Trades: {self.number_of_winning_trades}\n"
                 f"Average Trade Duration: {self.average_duration_of_trade}\n"
                 f"Strategy percentage change: {self.percentage_change_of_strategy:.2f}%\n"
-                f"Normalized Profit: {self.calculate_normalized_profit():.2f}%\n"
-                f"Sharpe Ratio: {self.calculate_sharpe_ratio():.2f}%\n")
+                f"Normalized Profit: {self.normalized_profit:.2f}%\n"
+                f"Sharpe Ratio: {self.sharpe_ratio:.2f}%\n")
 
 
 class Trade(Trading_session):

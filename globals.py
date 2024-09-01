@@ -33,6 +33,6 @@ number_of_trials = 100
 # Objectives - Only two can be chosen at the moment
 multi_objective = True
 profit_objective = True
-num_winning_trades_objectice = True
-sharpe_ratio_objective = False
+num_winning_trades_objectice = False
+sharpe_ratio_objective = True
 normalised_profit = False
