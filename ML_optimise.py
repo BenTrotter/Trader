@@ -33,19 +33,20 @@ def objective(trial):
         if param_type == 'int':
             filter_params[param_name] = trial.suggest_int(f'filter_{filter_func_name}_{param_name}', start, end)
         elif param_type == 'float':
-            filter_params[param_name] = trial.suggest_float(f'filter_{filter_func_name}_{param_name}', start, end)
+            filter_params[param_name] = trial.suggest_float(f'filter_{filter_func_name}_{param_name}', start, end, step=float_precision)
 
     for param_name, (param_type, start, end) in setup_func_info['params'].items():
         if param_type == 'int':
             setup_params[param_name] = trial.suggest_int(f'setup_{setup_func_name}_{param_name}', start, end)
         elif param_type == 'float':
-            setup_params[param_name] = trial.suggest_float(f'setup_{setup_func_name}_{param_name}', start, end)
+            setup_params[param_name] = trial.suggest_float(f'setup_{setup_func_name}_{param_name}', start, end, step=float_precision)
 
     for param_name, (param_type, start, end) in trigger_func_info['params'].items():
         if param_type == 'int':
             trigger_params[param_name] = trial.suggest_int(f'trigger_{trigger_func_name}_{param_name}', start, end)
         elif param_type == 'float':
-            trigger_params[param_name] = trial.suggest_float(f'trigger_{trigger_func_name}_{param_name}', start, end)
+            trigger_params[param_name] = trial.suggest_float(f'trigger_{trigger_func_name}_{param_name}', start, end, step=float_precision)
+
 
     # Create strategy instance with selected functions and suggested parameters
     strategy_df = combined_strategy(
