@@ -67,7 +67,7 @@ def backtest_strategy(display_backtester, data):
     if display_backtester:
         trading_session.display_trades()
         print(trading_session)
-        print(f"Buy and hold: {buy_and_hold}")
+        print(f"Buy and hold: {buy_and_hold}\n")
         plot_strategy(data, "Strategy", trading_session.trades)
     
     return trading_session.get_objectives()
