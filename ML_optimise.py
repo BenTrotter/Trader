@@ -63,8 +63,8 @@ def objective(trial):
     # Backtest strategy
     if multi_objective:
         # Define weightings for each objective
-        weight_1 = weight_objective_1  # Example weight for objective 1
-        weight_2 = weight_objective_2  # Example weight for objective 2
+        weight_1 = weight_objective_1
+        weight_2 = weight_objective_2
 
         objective_1, objective_2 = backtest_strategy(False, strategy_df)
         

@@ -122,18 +122,15 @@ class Trading_session:
     def get_objectives(self):
         results = []  
         
-        if profit_objective:
-            results.append(self.percentage_change_of_strategy)
-        
-        if num_winning_trades_objectice:
-            results.append(self.number_of_winning_trades)
-        
-        if sharpe_ratio_objective:
-            results.append(self.sharpe_ratio)
-        
         if normalised_profit:
             results.append(self.normalized_profit)
-        
+
+        if sharpe_ratio_objective:
+            results.append(self.sharpe_ratio) 
+
+        if num_winning_trades_objectice:
+            results.append(self.number_of_winning_trades)
+
         return tuple(results)
 
 

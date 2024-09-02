@@ -17,10 +17,10 @@ yfinance_data_source = False
 alpaca_data_source = True
 
 # Choose dates
-training_period_start = '2024-08-10'
-training_period_end = '2024-08-25'
-unseen_period_start = '2024-08-25'
-unseen_period_end = '2024-08-30'
+training_period_start = '2024-05-19'
+training_period_end = '2024-05-29'
+unseen_period_start = '2024-05-29'
+unseen_period_end = '2024-05-30'
 
 # Choose interval
 yfinance_interval = '5m'
@@ -32,14 +32,15 @@ number_of_trials = 100
 
 # Objectives - Only two can be chosen at the moment
 multi_objective = True
-profit_objective = True
-num_winning_trades_objectice = False
+normalised_profit = True
 sharpe_ratio_objective = True
-normalised_profit = False
+num_winning_trades_objectice = False
 
-# Objectives - objective weighting
-weight_objective_1 = 0.7
-weight_objective_2 = 0.3
+# Objectives - objective weighting (Edit trading_session.get_objectives() 
+# in order to choose which weighting is for which objective)
+weight_objective_1 = 0.6
+weight_objective_2 = 0.4
+
 
 # Performance metric
 risk_free_rate = 0.021
