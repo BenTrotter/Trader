@@ -65,9 +65,20 @@ class Trading_session:
 
 
     def calculate_normalized_profit(self):
-        # Normalized profit can be calculated as total profit divided by the starting balance
-        normalized_profit = (self.current_balance - self.starting_balance) / self.starting_balance
-        self.normalized_profit = normalized_profit
+        """
+        Calculate the total percentage profit over the trading session by compounding 
+        the percentage profit of each trade.
+        
+        This method considers the position size and compounding effect across multiple trades.
+        """
+        compounded_return = 1.0  # Start with a base of 1.0 (equivalent to 100%)
+
+        for trade in self.trades:
+            trade_return = 1 + (trade.profit_pct / 100)
+            compounded_return *= trade_return  # Compound the return
+        
+        # Subtract 1 to convert from a multiplier back to a percentage
+        self.normalized_profit = (compounded_return - 1) * 100
     
 
     def calculate_sharpe_ratio(self):
