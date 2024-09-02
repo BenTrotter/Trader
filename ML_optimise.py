@@ -59,14 +59,45 @@ def objective(trial):
     )
 
     # Backtest strategy
-    objective_1, objective_2 = backtest_strategy(False, strategy_df)
-    
-    # We want to maximize profit, so we return negative profit
-    return objective_1, objective_2
+    if multi_objective:
+        objective_1, objective_2 = backtest_strategy(False, strategy_df)
+        return objective_1, objective_2
+    else:
+        objective_1 = backtest_strategy(False, strategy_df)
 
 
 import optuna
 import optuna.visualization as vis
+
+import numpy as np
+
+def select_best_from_pareto(study):
+    """
+    Selects the best trial from the Pareto front based on the Euclidean distance to an ideal point.
+    This point is assumed to have the maximum possible values for all objectives.
+    
+    Args:
+        study (optuna.Study): The Optuna study object.
+    
+    Returns:
+        optuna.trial.FrozenTrial: The selected trial from the Pareto front.
+    """
+    # Extract the Pareto front trials
+    pareto_trials = study.best_trials
+    
+    # Calculate the ideal point (hypothetically the maximum for each objective)
+    ideal_point = np.max([trial.values for trial in pareto_trials], axis=0)
+    
+    # Calculate the Euclidean distance of each Pareto trial from the ideal point
+    distances = []
+    for trial in pareto_trials:
+        distance = np.linalg.norm(np.array(trial.values) - ideal_point)
+        distances.append(distance)
+    
+    # Find the trial with the minimum distance to the ideal point
+    best_index = np.argmin(distances)
+    return pareto_trials[best_index]
+
 
 if __name__ == "__main__":
 
@@ -91,8 +122,8 @@ if __name__ == "__main__":
         fig = vis.plot_pareto_front(study)
         fig.show()
 
-        # Let's assume we choose the first trial on the Pareto front as the "best" for demonstration
-        best_trial = study.best_trials[0]
+        # Select the best trial based on distance to an ideal point
+        best_trial = select_best_from_pareto(study)
         best_params = best_trial.params
     else:
         # Handle single-objective case
@@ -143,6 +174,7 @@ if __name__ == "__main__":
     )
     
     backtest_strategy(True, best_strategy_df)
+
 
     unseen_data = fetch_data('Unseen')
 
