@@ -9,6 +9,7 @@ from indicator_param_dictionary import *
 
 
 def objective(trial):
+
     # Select a filter function
     filter_func_name = trial.suggest_categorical('filter_func', list(functions_info['filter_functions'].keys()))
     filter_func_info = functions_info['filter_functions'][filter_func_name]
@@ -61,10 +62,20 @@ def objective(trial):
 
     # Backtest strategy
     if multi_objective:
+        # Define weightings for each objective
+        weight_1 = weight_objective_1  # Example weight for objective 1
+        weight_2 = weight_objective_2  # Example weight for objective 2
+
         objective_1, objective_2 = backtest_strategy(False, strategy_df)
-        return objective_1, objective_2
+        
+        # Apply the weightings
+        weighted_objective_1 = weight_1 * objective_1
+        weighted_objective_2 = weight_2 * objective_2
+        
+        return weighted_objective_1, weighted_objective_2
     else:
         objective_1 = backtest_strategy(False, strategy_df)
+        return objective_1
 
 
 import optuna

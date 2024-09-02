@@ -37,6 +37,10 @@ num_winning_trades_objectice = False
 sharpe_ratio_objective = True
 normalised_profit = False
 
+# Objectives - objective weighting
+weight_objective_1 = 0.7
+weight_objective_2 = 0.3
+
 # Performance metric
 risk_free_rate = 0.021
 winning_trades_param = 8
