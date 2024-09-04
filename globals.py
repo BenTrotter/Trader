@@ -17,18 +17,17 @@ yfinance_data_source = False
 alpaca_data_source = True
 
 # Choose dates
-training_period_start = '2024-05-19'
-training_period_end = '2024-05-29'
-unseen_period_start = '2024-05-29'
-unseen_period_end = '2024-05-30'
+training_period_start = '2024-07-10'
+training_period_end = '2024-08-27'
+unseen_period_start = '2024-08-27'
+unseen_period_end = '2024-08-31'
 
 # Choose interval
 yfinance_interval = '5m'
 alpaca_interval = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-number_of_trials = 100
-
+number_of_trials = 150
 
 # Objectives - Only two can be chosen at the moment
 multi_objective = True
@@ -36,15 +35,24 @@ normalised_profit = True
 sharpe_ratio_objective = True
 num_winning_trades_objectice = False
 
-# Objectives - objective weighting (Edit trading_session.get_objectives() 
-# in order to choose which weighting is for which objective)
+# Objectives - objective weighting
 weight_objective_1 = 0.6
 weight_objective_2 = 0.4
-
 
 # Performance metric
 risk_free_rate = 0.021
 winning_trades_param = 8
+
+# Take profit / stop loss calculation method and parameters
+take_profit_method_ATR = True
+stop_loss_method_ATR = True
+take_profit_percentage = 0.04
+stop_loss_percentage = 0.02
+risk_reward_ratio = 4 # sets the take profit / stop loss ratio
+atr_multipler = 1.5 # sets the multiple of the average true range to calculate the stop loss
+
+# Choose period for ATR
+atr_period = 10
 
 # Parameter optimisation float precision
 float_precision = 0.01

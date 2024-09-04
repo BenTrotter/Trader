@@ -33,6 +33,8 @@ def fetch_historic_yfinance_data(start_date, end_date, interval):
         download_df.rename(columns={'Date': 'Datetime'}, inplace=True)
     elif 'Datetime' in download_df.columns:
         download_df['Datetime'] = pd.to_datetime(download_df['Datetime'])
+
+    download_df = calculate_atr(download_df, atr_period)
     
     return download_df
 
@@ -71,14 +73,44 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
         raise ValueError("Specify either stock or crypto as True.")
 
     # Fetch the data
-    download_data = data_client.get_crypto_bars(request_params).df if crypto else data_client.get_stock_bars(request_params).df
+    download_df = data_client.get_crypto_bars(request_params).df if crypto else data_client.get_stock_bars(request_params).df
 
     # Reset the index to add a sequential index column and turn the current index columns into regular columns
-    download_data.reset_index(inplace=True)
+    download_df.reset_index(inplace=True)
 
-    download_data.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
+    download_df.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
 
-    return download_data
+    download_df = calculate_atr(download_df, atr_period)
+
+    return download_df
+ 
+
+def calculate_atr(df, atr_period):
+    """
+    Calculate the Average True Range (ATR) for a given DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame with 'High', 'Low', and 'Close' columns.
+        period (int): The period over which to calculate the ATR (default is 14).
+
+    Returns:
+        pd.DataFrame: The input DataFrame with an additional 'ATR' column.
+    """
+    # Calculate True Range (TR)
+    high_low = df['High'] - df['Low']
+    high_close = abs(df['High'] - df['Close'].shift(1))
+    low_close = abs(df['Low'] - df['Close'].shift(1))
+    
+    # Combine to get the True Range - take the maximum of the three possible values
+    df['TR'] = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+    
+    # Calculate the ATR
+    df['ATR'] = df['TR'].rolling(window=atr_period, min_periods=1).mean()
+    
+    # Drop the intermediate 'TR' column
+    df.drop(columns=['TR'], inplace=True)
+
+    return df
 
 
 def fetch_data(data_window_type):
@@ -86,20 +118,20 @@ def fetch_data(data_window_type):
     if alpaca_data_source:
 
         if data_window_type == 'Training':
-            data = fetch_historic_alpaca_data(training_period_start, training_period_end, alpaca_interval)
+            df = fetch_historic_alpaca_data(training_period_start, training_period_end, alpaca_interval)
 
         elif data_window_type == 'Unseen':
-            data = fetch_historic_alpaca_data(unseen_period_start, unseen_period_end, alpaca_interval)
+            df = fetch_historic_alpaca_data(unseen_period_start, unseen_period_end, alpaca_interval)
 
     elif yfinance_data_source:
 
         if data_window_type == 'Training': 
-            data = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+            df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
 
         elif data_window_type == 'Unseen':
-            data = fetch_historic_yfinance_data(unseen_period_start, unseen_period_end, yfinance_interval)
+            df = fetch_historic_yfinance_data(unseen_period_start, unseen_period_end, yfinance_interval)
 
-    return data
+    return df
 
 
 if __name__ == "__main__":

@@ -149,6 +149,7 @@ class Trade(Trading_session):
     
     def __init__(self,
                  open_price: float,
+                 open_ATR: float,
                  long: bool,
                  short: bool,
                  take_profit_pct: float,
@@ -162,14 +163,15 @@ class Trade(Trading_session):
         self.close_time = close_time
         self.open_price = round(open_price, 2)
         self.close_price = round(close_price, 2)
+        self.open_ATR = open_ATR
         self.quantity = quantity
         self.long = long
         self.short = short
         self.take_profit_pct = take_profit_pct
         self.stop_loss_pct = stop_loss_pct
         self.value_of_trade = self.calculate_value_of_trade()
-        self.take_profit_price = self.calculate_take_profit_price()
-        self.stop_loss_price = self.calculate_stop_loss_price()
+        self.stop_loss_price = self.calculate_ATR_stop_loss_price() if stop_loss_method_ATR else self.calculate_stop_loss_price()
+        self.take_profit_price = self.calculate_ATR_take_profit_price() if take_profit_method_ATR else self.calculate_take_profit_price()
         self.profit_pct = 0
         self.duration = 0
         self.profit = 0
@@ -232,6 +234,19 @@ class Trade(Trading_session):
         elif self.short:
             stop_loss_price = self.open_price * (1 + self.stop_loss_pct)
         return stop_loss_price
+    
+
+    def calculate_ATR_take_profit_price(self):
+        ATR_stop_loss_distance = self.open_ATR * atr_multipler
+        ATR_take_profit_distance = ATR_stop_loss_distance * risk_reward_ratio
+        ATR_take_profit_price = self.open_price + ATR_take_profit_distance
+        return ATR_take_profit_price
+    
+
+    def calculate_ATR_stop_loss_price(self):
+        ATR_stop_loss_distance = self.open_ATR * atr_multipler
+        ATR_stop_loss_price = self.open_price - ATR_stop_loss_distance
+        return ATR_stop_loss_price
 
 
     def close_trade(self, close_time, close_price, close_reason):
@@ -264,5 +279,3 @@ class Trade(Trading_session):
 
         # Create and return the formatted table
         return tabulate(table_data, headers=["Attribute", "Value"], tablefmt="grid")
-
-    

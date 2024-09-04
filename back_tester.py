@@ -10,7 +10,7 @@ from data_fetch import *
 from globals import *
 
 
-def open_trade(open_time, open_price, trade_type):
+def open_trade(open_time, open_price, atr, trade_type):
     """
     Args:
         trade_type (boolean): True is long, False is short
@@ -18,29 +18,31 @@ def open_trade(open_time, open_price, trade_type):
     return Trade(
         open_time=open_time,
         open_price=open_price,
+        open_ATR = atr,
         quantity=quantity,
         long=trade_type,
         short= not trade_type,
-        take_profit_pct=0.04,
-        stop_loss_pct=0.02)
+        take_profit_pct=take_profit_percentage,
+        stop_loss_pct=stop_loss_percentage)
 
 
 def analyse_row(trading_session, trade, row):
-    if trade != None:
+
+    if trade is None:
+        if row['Combined_Signal'] == 1:
+            trade = open_trade(row['Datetime'], row['Close'], row['ATR'], True) # Open Long
+
+    elif trade is not None:
         if trade.long:
-            # if row['High'] >= trade.take_profit_price:
-            #     trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached take profit")) # Close Long
-            #     trade = None
-            if row['Combined_Signal'] == -1:
+            if row['High'] >= trade.take_profit_price:
+                trading_session.add_trade(trade.close_trade(row['Datetime'], row['Close'], "Reached take profit")) # Close Long
+                trade = None
+            elif row['Combined_Signal'] == -1:
                 trading_session.add_trade(trade.close_trade(row['Datetime'], row['Close'], "Next short signal reached")) # Close Long
                 trade = None
-            # elif row['Low'] <= trade.stop_loss_price:
-            #     trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached stop loss")) # Close Long
-            #     trade = None
-
-    elif trade == None:
-        if row['Combined_Signal'] == 1:
-            trade = open_trade(row['Datetime'], row['Close'], True) # Open Long
+            elif row['Low'] <= trade.stop_loss_price:
+                trading_session.add_trade(trade.close_trade(row['Datetime'], row['Close'], "Reached stop loss")) # Close Long
+                trade = None
 
     return trade, trading_session
 
