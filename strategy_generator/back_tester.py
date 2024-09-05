@@ -80,9 +80,9 @@ if __name__ == "__main__":
 
     backtest_strategy(True,
                       combined_strategy(data, 
-                            filter_func=generate_SMA_filter_signal,
-                            setup_func=generate_RSI_setup_signal,
-                            trigger_func=generate_MACD_trigger_signal,
-                            filter_params={'sma_window': 5, 'look_back_period': 3},
-                            setup_params={'period': 14, 'overbought_condition': 60, 'oversold_condition': 40},
-                            trigger_params={'fast_period': 12, 'slow_period': 26, 'signal_period': 9}))
+                            filter_func=generate_BollingerBands_filter_signal,
+                            setup_func=generate_ADX_setup_signal,
+                            trigger_func=generate_parabolic_sar_trigger_signal,
+                            filter_params={'bollinger_window': 19, 'num_std_dev': 2.05},
+                            setup_params={'adx_window': 25, 'strong_trend_threshold': 34},
+                            trigger_params={'initial_af': 0, 'max_af': 0, 'step_af': 0}))
