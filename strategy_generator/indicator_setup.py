@@ -62,9 +62,56 @@ def generate_Stochastic_setup_signal(df, k_period, d_period, stochastic_overboug
     return df
 
 
+def generate_ADX_setup_signal(df, adx_window, strong_trend_threshold):
+    """
+    ADX (Average Directional Index) Setup Signal to identify strong uptrends.
+    
+    df: DataFrame containing the trading data.
+    adx_window: Number of periods to calculate the ADX.
+    strong_trend_threshold: The ADX value above which the trend is considered strong.
+    
+    Returns: DataFrame with the original columns, 'Setup_Signal', and 'ADX'.
+    """
+    # Step 1: Calculate True Range (TR)
+    df['High-Low'] = df['High'] - df['Low']
+    df['High-Close'] = abs(df['High'] - df['Close'].shift(1))
+    df['Low-Close'] = abs(df['Low'] - df['Close'].shift(1))
+    
+    # True Range is the maximum of these
+    df['TR'] = df[['High-Low', 'High-Close', 'Low-Close']].max(axis=1)
+    
+    # Step 2: Calculate Directional Movement (+DM and -DM)
+    df['+DM'] = np.where((df['High'] - df['High'].shift(1)) > (df['Low'].shift(1) - df['Low']), 
+                         np.maximum((df['High'] - df['High'].shift(1)), 0), 0)
+    df['-DM'] = np.where((df['Low'].shift(1) - df['Low']) > (df['High'] - df['High'].shift(1)), 
+                         np.maximum((df['Low'].shift(1) - df['Low']), 0), 0)
+    
+    # Step 3: Smooth the True Range and Directional Movements
+    df['ATR'] = df['TR'].rolling(window=adx_window).mean()
+    df['+DI'] = (df['+DM'].rolling(window=adx_window).mean() / df['ATR']) * 100
+    df['-DI'] = (df['-DM'].rolling(window=adx_window).mean() / df['ATR']) * 100
+    
+    # Step 4: Calculate the Directional Index (DX) and ADX
+    df['DX'] = (abs(df['+DI'] - df['-DI']) / (df['+DI'] + df['-DI'])) * 100
+    df['ADX'] = df['DX'].rolling(window=adx_window).mean()
+    
+    # Step 5: Setup signal based on ADX and +DI > -DI (indicating a strong uptrend)
+    df['Setup_Signal'] = np.where((df['ADX'] > strong_trend_threshold) & (df['+DI'] > df['-DI']), 1, 0)  # Buy signal for strong uptrend
+    
+    # Drop all columns except original columns, 'Setup_Signal', and 'ADX'
+    df = df[['Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Setup_Signal', 'ADX']]
+
+    return df
+
+
 def test_indicator():
-    df = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
-    print(generate_Stochastic_setup_signal(df, k_period=14, d_period=3, stochastic_overbought=60, stochastic_oversold=40))
+    df = fetch_data("Training")
+    # Test the ADX setup signal method
+    adx_window = 14  # Common period for ADX calculation
+    strong_trend_threshold = 30  # ADX > 25 indicates a strong trend
+    print(generate_ADX_setup_signal(df, adx_window, strong_trend_threshold))
+    
+    # print(df_with_adx_signal[['ADX', 'Setup_Signal']])
 
 
 if __name__ == "__main__":

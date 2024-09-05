@@ -45,10 +45,35 @@ def generate_BollingerBands_filter_signal(df, bollinger_window, num_std_dev):
     
     return df
 
+def generate_ATR_filter_signal(df, filter_atr_window, atr_upper_threshold, atr_lower_threshold):
+    # Calculate True Range (TR)
+    high_low = df['High'] - df['Low']
+    high_close = abs(df['High'] - df['Close'].shift(1))
+    low_close = abs(df['Low'] - df['Close'].shift(1))
+    
+    # Combine to get the True Range - take the maximum of the three possible values
+    df['Filter_TR'] = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+    
+    # Calculate the ATR
+    df['Filter_ATR'] = df['Filter_TR'].rolling(window=filter_atr_window, min_periods=1).mean()
+    
+    # Initialize 'Filter_Signal' with neutral (0)
+    df['Filter_Signal'] = 0
+
+    # Generate a buy signal if ATR is above the threshold (high volatility) and sell if it's below (low volatility)
+    df.loc[df['Filter_ATR'] > atr_upper_threshold, 'Filter_Signal'] = 1  # Buy signal for high volatility
+    df.loc[df['Filter_ATR'] < atr_lower_threshold, 'Filter_Signal'] = -1  # Sell signal for low volatility
+
+    # Drop the intermediate 'TR' column
+    df.drop(columns=['Filter_TR'], inplace = True)
+    df.drop(columns=['Filter_ATR'], inplace = True)
+
+    return df
+
 
 def test_indicator():
-    df = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
-    print(generate_BollingerBands_filter_signal(df, 10, 0.5))
+    df = fetch_data("Training")
+    print(generate_ATR_filter_signal(df, 14, 28, 15))  # ATR window of 14 with upper threshold 0.05 and lower threshold 0.02
 
 
 if __name__ == "__main__":

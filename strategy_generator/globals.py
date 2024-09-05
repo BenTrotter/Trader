@@ -17,17 +17,17 @@ YFINANCE_DATA_SOURCE = False
 ALPACA_DATA_SOURCE = True
 
 # Choose dates
-TRAINING_PERIOD_START = '2024-07-01'
-TRAINING_PERIOD_END = '2024-08-27'
-UNSEEN_PERIOD_START = '2024-08-27'
-UNSEEN_PERIOD_END = '2024-08-31'
+TRAINING_PERIOD_START = '2024-09-01'
+TRAINING_PERIOD_END = '2024-09-03'
+UNSEEN_PERIOD_START = '2024-08-03'
+UNSEEN_PERIOD_END = '2024-08-04'
 
 # Choose interval
 YFINANCE_INTERVAL = '5m'
 ALPACA_INTERVAL = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-NUMBER_OF_TRIALS = 200
+NUMBER_OF_TRIALS = 25
 
 # Objectives - Only two can be chosen at the moment
 MULTI_OBJECTIVE = True
@@ -44,8 +44,7 @@ RISK_FREE_RATE = 0.021
 WINNING_TRADES_PARAM = 8
 
 # Take profit / stop loss calculation method and parameters
-# TODO: implement logic to turn off sl tp
-CLOSE_POSITION_WITH_SLTP = True 
+CLOSE_POSITION_WITH_SLTP = True # Boolean to set whether trades can be closed with sl/tp or only sell signal
 RISK_REWARD_RATIO = 4 # sets the take profit / stop loss ratio
 ATR_MULTIPLIER = 1.5 # sets the multiple of the average true range to calculate the stop loss
 

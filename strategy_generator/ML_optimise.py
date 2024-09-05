@@ -52,7 +52,7 @@ def objective(trial):
 
 
     # Create strategy instance with selected functions and suggested parameters
-    df = combined_strategy(
+    strategy_df = combined_strategy(
         df.copy(),
         filter_func,
         setup_func,
@@ -76,7 +76,7 @@ def objective(trial):
         
         return weighted_objective_1, weighted_objective_2
     else:
-        objective_1 = backtest_strategy(False, df)
+        objective_1 = backtest_strategy(False, strategy_df)
         return objective_1
 
 

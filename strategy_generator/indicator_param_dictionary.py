@@ -6,12 +6,12 @@ from indicator_trigger import *
 functions_info = {
 
     # Filter Functions
-
+    
     'filter_functions': {
         'generate_SMA_filter_signal': {
             'function': generate_SMA_filter_signal,
             'params': {
-                'sma_window': ('int', 5, 15), 
+                'sma_window': ('int', 5, 15), # TODO: Add intervals for ML to search over
                 'look_back_period': ('int', 1, 5) 
             }
         },
@@ -20,6 +20,14 @@ functions_info = {
             'params': {
                 'bollinger_window': ('int', 5, 20),
                 'num_std_dev': ('float', 0.5, 2.5) 
+            }
+        },
+        'generate_ATR_filter_signal': {
+            'function': generate_ATR_filter_signal,
+            'params': {
+                'filter_atr_window': ('int', 5, 20),
+                'atr_upper_threshold': ('float', 25, 40),
+                'atr_lower_threshold': ('float', 5, 20)
             }
         }
     },
@@ -43,6 +51,13 @@ functions_info = {
                 'stochastic_overbought': ('int', 55, 70),
                 'stochastic_oversold': ('int', 30, 45)  
             }
+        },
+        'generate_ADX_setup_signal': {
+            'function': generate_ADX_setup_signal,
+            'params': {
+                'adx_window': ('int', 7, 28),
+                'strong_trend_threshold': ('int', 20, 35)
+            }
         }
     },
 
@@ -62,6 +77,14 @@ functions_info = {
             'params': {
                 'short_window': ('int', 5, 15),  
                 'long_window': ('int', 10, 25)  
+            }
+        },
+        'generate_parabolic_sar_trigger_signal': {
+            'function': generate_parabolic_sar_trigger_signal,
+            'params': {
+                'initial_af': ('int', 0.01, 0.05),  
+                'max_af': ('int', 0.1, 0.3),
+                'step_af': ('int', 0.01, 0.05)  
             }
         }
     }
