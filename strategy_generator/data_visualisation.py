@@ -1,9 +1,9 @@
+from globals import *
 import matplotlib.pyplot as plt
 import pandas as pd
-from globals import *
 
 
-def plot_strategy(data, strategy_name, trades):
+def plot_strategy(df, strategy_name, trades):
     """
     Plots the stock price, signals for buy/sell, and trade points.
 
@@ -14,16 +14,16 @@ def plot_strategy(data, strategy_name, trades):
         trades (list): A list of Trade objects containing the trades to plot.
     """
     # Ensure the "Datetime" column is in datetime format
-    if not pd.api.types.is_datetime64_any_dtype(data['Datetime']):
-        data['Datetime'] = pd.to_datetime(data['Datetime'])
+    if not pd.api.types.is_datetime64_any_dtype(df['Datetime']):
+        df['Datetime'] = pd.to_datetime(df['Datetime'])
 
     # Set the "Datetime" column as the DataFrame's index
-    data.set_index('Datetime', inplace=True)
+    df.set_index('Datetime', inplace=True)
 
     plt.figure(figsize=(14, 7))
 
     # Plot the stock's closing price
-    plt.plot(data['Close'], label='Close Price', color='blue', alpha=0.5)
+    plt.plot(df['Close'], label='Close Price', color='blue', alpha=0.5)
 
     # Prepare lists for trade open and close points
     open_times = []

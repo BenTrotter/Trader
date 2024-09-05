@@ -148,30 +148,22 @@ class Trading_session:
 class Trade(Trading_session):
     
     def __init__(self,
-                 open_price: float,
+                 open_price_of_trade: float,
                  open_ATR: float,
-                 long: bool,
-                 short: bool,
-                 take_profit_pct: float,
-                 stop_loss_pct: float,
-                 close_price: float = 0,
+                 close_price_of_trade: float = 0,
                  open_time: datetime = None,
                  close_time: datetime = None,
                  quantity: float = 1,
                  ):
         self.open_time = open_time
         self.close_time = close_time
-        self.open_price = round(open_price, 2)
-        self.close_price = round(close_price, 2)
+        self.open_price_of_trade = round(open_price_of_trade, 2)
+        self.close_price_of_trade = round(close_price_of_trade, 2)
         self.open_ATR = open_ATR
         self.quantity = quantity
-        self.long = long
-        self.short = short
-        self.take_profit_pct = take_profit_pct
-        self.stop_loss_pct = stop_loss_pct
         self.value_of_trade = self.calculate_value_of_trade()
-        self.stop_loss_price = self.calculate_ATR_stop_loss_price() if STOP_LOSS_METHOD_ATR else self.calculate_stop_loss_price()
-        self.take_profit_price = self.calculate_ATR_take_profit_price() if TAKE_PROFIT_METHOD_ATR else self.calculate_take_profit_price()
+        self.stop_loss_price = self.calculate_ATR_stop_loss_price()
+        self.take_profit_price = self.calculate_ATR_take_profit_price()
         self.profit_pct = 0
         self.duration = 0
         self.profit = 0
@@ -180,25 +172,15 @@ class Trade(Trading_session):
     def calculate_value_of_trade(self) -> float:
         """
         """
-        return self.open_price * self.quantity
+        return self.open_price_of_trade * self.quantity
 
     def calculate_profit(self) -> float:
         """
         Calculate the profit of the trade and profit percentage
-        Profit is calculated differently for long and short trades.
-        For long trades, profit = (close_price - open_price) * quantity
-        For short trades, profit = (open_price - close_price) * quantity
         """
-        if self.long:
-            profit = (self.close_price - self.open_price) * self.quantity
-            profit_pct = ((self.close_price - self.open_price) / self.open_price) * 100
-            return profit, profit_pct
-        elif self.short:
-            profit = (self.open_price - self.close_price) * self.quantity
-            profit_pct = ((self.open_price - self.close_price) / self.close_price) * 100
-            return profit, profit_pct
-        else:
-            return 0.0, 0.0
+        profit = (self.close_price_of_trade - self.open_price_of_trade) * self.quantity
+        profit_pct = ((self.close_price_of_trade - self.open_price_of_trade) / self.open_price_of_trade) * 100
+        return profit, profit_pct
         
         
     def calculate_duration(self):
@@ -220,38 +202,22 @@ class Trade(Trading_session):
         return int(duration.total_seconds())
     
 
-    def calculate_take_profit_price(self):
-        if self.long:
-            take_profit_price = self.open_price * (1 + self.take_profit_pct)
-        elif self.short:
-            take_profit_price = self.open_price * (1 - self.take_profit_pct)
-        return take_profit_price
-    
-
-    def calculate_stop_loss_price(self):
-        if self.long:
-            stop_loss_price = self.open_price * (1 - self.stop_loss_pct)
-        elif self.short:
-            stop_loss_price = self.open_price * (1 + self.stop_loss_pct)
-        return stop_loss_price
-    
-
     def calculate_ATR_take_profit_price(self):
         ATR_stop_loss_distance = self.open_ATR * ATR_MULTIPLIER
         ATR_take_profit_distance = ATR_stop_loss_distance * RISK_REWARD_RATIO
-        ATR_take_profit_price = self.open_price + ATR_take_profit_distance
+        ATR_take_profit_price = self.open_price_of_trade + ATR_take_profit_distance
         return ATR_take_profit_price
     
 
     def calculate_ATR_stop_loss_price(self):
         ATR_stop_loss_distance = self.open_ATR * ATR_MULTIPLIER
-        ATR_stop_loss_price = self.open_price - ATR_stop_loss_distance
+        ATR_stop_loss_price = self.open_price_of_trade - ATR_stop_loss_distance
         return ATR_stop_loss_price
 
 
     def close_trade(self, close_time, close_price, close_reason):
         self.close_time = close_time
-        self.close_price = close_price
+        self.close_price_of_trade = close_price
         self.profit, self.profit_pct = self.calculate_profit()
         self.duration = self.calculate_duration()
         self.close_reason = close_reason
@@ -264,11 +230,10 @@ class Trade(Trading_session):
         table_data = [
             ["Open Time", self.open_time],
             ["Close Time", self.close_time],
-            ["Open Price", f"${self.open_price:.2f}"],
-            ["Close Price", f"${self.close_price:.2f}"],
+            ["Open Price", f"${self.open_price_of_trade:.2f}"],
+            ["Close Price", f"${self.close_price_of_trade:.2f}"],
             ["Quantity", self.quantity],
             ["Trade Value", f"${self.value_of_trade:.2f}"],
-            ["Trade Type", "Long" if self.long else "Short"],
             ["Take Profit Price", f"${self.take_profit_price:.2f}" if self.take_profit_price else "N/A"],
             ["Stop Loss Price", f"${self.stop_loss_price:.2f}" if self.stop_loss_price else "N/A"],
             ["Close Reason", self.close_reason if self.close_reason else "N/A"],

@@ -1,11 +1,11 @@
-# backtest_strategy.py
+import os
+from dotenv import load_dotenv
+from globals import *
 from alpaca.data.historical import StockHistoricalDataClient, CryptoHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest, CryptoBarsRequest
 import pandas as pd
 import yfinance as yf
-import os
-from dotenv import load_dotenv
-from globals import *
+
 
 
 def fetch_historic_yfinance_data(start_date, end_date, interval):
@@ -44,15 +44,12 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
     # Load environment variables from .env file
     load_dotenv(override=True)
 
-    # Alpaca API credentials
     ALPACA_PERSONAL_API_KEY_ID = os.getenv('ALPACA_PERSONAL_API_KEY_ID')
     ALPACA_PERSONAL_API_SECRET_KEY = os.getenv('ALPACA_PERSONAL_API_SECRET_KEY')
 
-    # Common code for both stock and crypto
     period_start = pd.to_datetime(period_start)
     period_end = pd.to_datetime(period_end)
     
-    # Choose the client and request parameters based on the type of asset
     if STOCK:
         data_client = StockHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
         request_params = StockBarsRequest(
@@ -72,17 +69,16 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
     else:
         raise ValueError("Specify either stock or crypto as True.")
 
-    # Fetch the data
-    download_df = data_client.get_crypto_bars(request_params).df if CRYPTO else data_client.get_stock_bars(request_params).df
+    df = data_client.get_crypto_bars(request_params).df if CRYPTO else data_client.get_stock_bars(request_params).df
 
     # Reset the index to add a sequential index column and turn the current index columns into regular columns
-    download_df.reset_index(inplace=True)
+    df.reset_index(inplace=True)
 
-    download_df.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
+    df.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
 
-    download_df = calculate_atr(download_df)
+    df = calculate_atr(df)
 
-    return download_df
+    return df
  
 
 def calculate_atr(df):

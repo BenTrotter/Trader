@@ -1,6 +1,8 @@
 from globals import *
 import optuna
-from back_tester import fetch_historic_yfinance_data, backtest_strategy
+import optuna.visualization as vis
+import numpy as np
+from back_tester import backtest_strategy
 from combined_strategy import combined_strategy
 from indicator_filter import *
 from indicator_setup import *
@@ -50,7 +52,7 @@ def objective(trial):
 
 
     # Create strategy instance with selected functions and suggested parameters
-    strategy_df = combined_strategy(
+    df = combined_strategy(
         df.copy(),
         filter_func,
         setup_func,
@@ -66,7 +68,7 @@ def objective(trial):
         weight_1 = WEIGHT_OBJECTIVE_1
         weight_2 = WEIGHT_OBJECTIVE_2
 
-        objective_1, objective_2 = backtest_strategy(False, strategy_df)
+        objective_1, objective_2 = backtest_strategy(False, df)
         
         # Apply the weightings
         weighted_objective_1 = weight_1 * objective_1
@@ -74,14 +76,9 @@ def objective(trial):
         
         return weighted_objective_1, weighted_objective_2
     else:
-        objective_1 = backtest_strategy(False, strategy_df)
+        objective_1 = backtest_strategy(False, df)
         return objective_1
 
-
-import optuna
-import optuna.visualization as vis
-
-import numpy as np
 
 def select_best_from_pareto(study):
     """

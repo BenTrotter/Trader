@@ -1,6 +1,6 @@
+from globals import *
 import numpy as np
 from data_fetch import *
-from globals import *
 
 
 def generate_MACD_trigger_signal(df, fast_period, slow_period, signal_period):

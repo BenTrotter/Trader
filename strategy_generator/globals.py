@@ -46,10 +46,6 @@ WINNING_TRADES_PARAM = 8
 # Take profit / stop loss calculation method and parameters
 # TODO: implement logic to turn off sl tp
 CLOSE_POSITION_WITH_SLTP = True 
-TAKE_PROFIT_METHOD_ATR = True
-STOP_LOSS_METHOD_ATR = True
-TAKE_PROFIT_PERCENTAGE = 0.04
-STOP_LOSS_PERCENTAGE = 0.02
 RISK_REWARD_RATIO = 4 # sets the take profit / stop loss ratio
 ATR_MULTIPLIER = 1.5 # sets the multiple of the average true range to calculate the stop loss
 

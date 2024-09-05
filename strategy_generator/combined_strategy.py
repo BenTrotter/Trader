@@ -1,9 +1,9 @@
-from globals import *
 import os
+from globals import *
+from data_fetch import *
 from indicator_filter import *
 from indicator_setup import *
 from indicator_trigger import *
-from data_fetch import *
 
 
 def combined_strategy(df, filter_func, setup_func, trigger_func, filter_params={}, setup_params={}, trigger_params={}):

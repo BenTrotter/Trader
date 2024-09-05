@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 import pandas as pd
 import numpy as np  # Make sure to import numpy
 from alpaca_functions import *
-from strategy_generator.trading_session import *
-from strategy_generator.indicator_filter import *
-from strategy_generator.indicator_setup import *
-from strategy_generator.indicator_trigger import *
-from strategy_generator.combined_strategy import combined_strategy
+from trading_session import *
+from indicator_filter import *
+from indicator_setup import *
+from indicator_trigger import *
+from combined_strategy import combined_strategy
 from globals import *
 
 # Load environment variables from .env file
@@ -31,6 +31,8 @@ elif(STOCK):
 
 # Initialize an empty DataFrame to store incoming bar data
 columns = ['symbol', 'timestamp', 'Open', 'High', 'Low', 'Close', 'Volume', 'trade_count', 'vwap']
+
+
 growing_df = pd.DataFrame(columns=columns)
 growing_df_from_alpaca  = pd.DataFrame(columns=columns)
 
@@ -38,11 +40,12 @@ growing_df_from_alpaca  = pd.DataFrame(columns=columns)
 count = 0
 
 # Start trading session
+# TODO: Fetch starting balance from alpaca
 trading_session = Trading_session(1000)
 trade = None
 
 # Async handler to process incoming bar data
-async def quote_data_handler(data):
+async def quote_data_handler(df):
     global growing_df_from_alpaca 
     global growing_df
     global trading_session
@@ -57,15 +60,15 @@ async def quote_data_handler(data):
 
     # Convert incoming data to a dictionary
     bar_data = {
-        'symbol': data.symbol,
-        'timestamp': data.timestamp,
-        'Open': data.open,
-        'High': data.high,
-        'Low': data.low,
-        'Close': data.close,
-        'Volume': data.volume,
-        'trade_count': data.trade_count,
-        'vwap': data.vwap
+        'symbol': df.symbol,
+        'timestamp': df.timestamp,
+        'Open': df.open,
+        'High': df.high,
+        'Low': df.low,
+        'Close': df.close,
+        'Volume': df.volume,
+        'trade_count': df.trade_count,
+        'vwap': df.vwap
     }
 
     growing_df_from_alpaca = pd.concat([growing_df_from_alpaca, pd.DataFrame([bar_data])], ignore_index=True)

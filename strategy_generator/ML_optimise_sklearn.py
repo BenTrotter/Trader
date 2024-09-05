@@ -7,6 +7,7 @@ from data_fetch import fetch_data
 from indicator_param_dictionary import functions_info
 from sklearn.metrics import make_scorer
 
+
 class TradingStrategy(BaseEstimator):
     def __init__(self, 
                  filter_func_name=None, 
@@ -29,7 +30,7 @@ class TradingStrategy(BaseEstimator):
         """
         Score method to evaluate strategy performance.
         """
-        strategy_df = combined_strategy(
+        df = combined_strategy(
             X.copy(),
             functions_info['filter_functions'][self.filter_func_name]['function'],
             functions_info['setup_functions'][self.setup_func_name]['function'],
@@ -40,7 +41,7 @@ class TradingStrategy(BaseEstimator):
         )
 
         # Perform backtest and return a performance metric (e.g., total profit)
-        performance_metric = backtest_strategy(False, strategy_df)
+        performance_metric = backtest_strategy(False, df)
         
         # Ensure the performance metric is valid and handle NaN
         if np.isnan(performance_metric) or performance_metric <= 0:
@@ -64,7 +65,6 @@ class TradingStrategy(BaseEstimator):
             'trigger_params': self.trigger_params
         }
 
-from sklearn.metrics import make_scorer
 
 # Custom scorer function for the trading strategy
 def custom_scorer(estimator, X):
@@ -96,6 +96,7 @@ for func_type, func_dict in [('filter', functions_info['filter_functions']),
                 param_grid[f'{func_type}_params__{param_name}'] = np.arange(start, end + 1)
             elif param_type == 'float':
                 param_grid[f'{func_type}_params__{param_name}'] = np.linspace(start, end, num=10)
+
 
 if __name__ == "__main__":
     # Fetch data for training

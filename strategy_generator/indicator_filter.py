@@ -1,6 +1,7 @@
+from globals import *
 import pandas as pd
 from data_fetch import *
-from globals import *
+
 
 def generate_SMA_filter_signal(df, sma_window, look_back_period):
     """

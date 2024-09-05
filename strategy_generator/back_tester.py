@@ -1,4 +1,3 @@
-# backtest_strategy.py
 from alpaca.data.timeframe import TimeFrame
 from trading_session import *
 from data_visualisation import *
@@ -10,54 +9,49 @@ from data_fetch import *
 from globals import *
 
 
-def open_trade(open_time, open_price, atr, trade_type):
-    """
-    Args:
-        trade_type (boolean): True is long, False is short
-    """
+def open_trade(open_time, open_price, atr):
     return Trade(
         open_time=open_time,
-        open_price=open_price,
+        open_price_of_trade=open_price,
         open_ATR = atr,
-        quantity=QUANTITY,
-        long=trade_type,
-        short= not trade_type,
-        take_profit_pct=TAKE_PROFIT_PERCENTAGE,
-        stop_loss_pct=STOP_LOSS_PERCENTAGE)
+        quantity=QUANTITY)
 
 
-def analyse_row(trading_session, trade, row):
+def calculate_buy_and_hold(df):
+    open_price_of_window = df["Open"].iloc[0]
+    closing_price_of_window = df["Close"].iloc[-1]
+    buy_and_hold = ((closing_price_of_window - open_price_of_window) / open_price_of_window) * 100
+    return buy_and_hold
+
+
+def analyse_row(trading_session, trade, latest_bar):
 
     if trade is None:
-        if row['Combined_Signal'] == 1:
-            trade = open_trade(row['Datetime'], row['Close'], row['ATR'], True) # Open Long
+        if latest_bar['Combined_Signal'] == 1:
+            trade = open_trade(latest_bar['Datetime'], latest_bar['Close'], latest_bar['ATR']) # Open Long
 
     elif trade is not None:
-        if trade.long:
-            if row['High'] >= trade.take_profit_price:
-                trading_session.add_trade(trade.close_trade(row['Datetime'], row['Close'], "Reached take profit")) # Close Long
-                trade = None
-            elif row['Combined_Signal'] == -1:
-                trading_session.add_trade(trade.close_trade(row['Datetime'], row['Close'], "Next short signal reached")) # Close Long
-                trade = None
-            elif row['Low'] <= trade.stop_loss_price:
-                trading_session.add_trade(trade.close_trade(row['Datetime'], row['Close'], "Reached stop loss")) # Close Long
-                trade = None
+        if latest_bar['High'] >= trade.take_profit_price:
+            trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached take profit")) # Close Long
+            trade = None
+        elif latest_bar['Combined_Signal'] == -1:
+            trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached sell signal")) # Close Long
+            trade = None
+        elif latest_bar['Low'] <= trade.stop_loss_price:
+            trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached stop loss")) # Close Long
+            trade = None
 
     return trade, trading_session
 
 
-def backtest_strategy(display_backtester, data):
+def backtest_strategy(display_backtester, df):
 
-    open_price_of_window = data["Open"].iloc[0]
-    closing_price_of_window = data["Close"].iloc[-1]
-    buy_and_hold = ((closing_price_of_window - open_price_of_window) / open_price_of_window) * 100
+    buy_and_hold = calculate_buy_and_hold(df)
 
     trading_session = Trading_session(STARTING_BALANCE)
-
-    # Iterate over DataFrame rows and populate list of Trades
     trade = None
-    for index, row in data.iterrows():
+
+    for index, row in df.iterrows():
         trade, trading_session = analyse_row(trading_session, trade, row)
 
     trading_session.calculate_percentage_change_of_strategy()
@@ -70,7 +64,7 @@ def backtest_strategy(display_backtester, data):
         trading_session.display_trades()
         print(trading_session)
         print(f"Buy and hold: {buy_and_hold}\n")
-        plot_strategy(data, "Strategy", trading_session.trades)
+        plot_strategy(df, "Strategy", trading_session.trades)
     
     return trading_session.get_objectives()
 

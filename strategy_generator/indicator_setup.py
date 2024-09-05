@@ -1,6 +1,7 @@
 import numpy as np
 from data_fetch import *
 
+
 def generate_RSI_setup_signal(df, period, overbought_condition, oversold_condition):
     
     # Step 1: Calculate Price Changes

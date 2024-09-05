@@ -1,4 +1,4 @@
-from globals import *
+from strategy_generator.globals import *
 import pandas as pd
 import os
 import numpy as np
