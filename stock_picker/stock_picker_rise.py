@@ -13,8 +13,8 @@ import os
 # Constants
 LOOKBACK_PERIOD = 30  # Days for historical data
 PREDICTION_DAYS = 1  # Days to predict
-VALIDATION_DATE = stock_pick_validation_date
-TRAINING_START_DATE = training_period_stockpick_start
+VALIDATION_DATE = STOCK_PICKER_VALIDATION_DATE
+TRAINING_START_DATE = TRAINING_PERIOD_STOCKPICK_START
 TRAINING_END_DATE = training_period_end
 VALIDATE = True
 

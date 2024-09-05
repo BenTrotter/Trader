@@ -45,21 +45,20 @@ winning_trades_param = 8
 
 # Take profit / stop loss calculation method and parameters
 # TODO: implement logic to turn off sl tp
-close_position_method_SLTP = True 
-take_profit_method_ATR = True
-stop_loss_method_ATR = True
-take_profit_percentage = 0.04
-stop_loss_percentage = 0.02
-risk_reward_ratio = 4 # sets the take profit / stop loss ratio
-atr_multipler = 1.5 # sets the multiple of the average true range to calculate the stop loss
+CLOSE_POSITION_WITH_SLTP = True 
+TAKE_PROFIT_METHOD_ATR = True
+STOP_LOSS_METHOD_ATR = True
+TAKE_PROFIT_PERCENTAGE = 0.04
+STOP_LOSS_PERCENTAGE = 0.02
+RISK_REWARD_RATIO = 4 # sets the take profit / stop loss ratio
+ATR_MULTIPLIER = 1.5 # sets the multiple of the average true range to calculate the stop loss
 
 # Choose period for ATR
-atr_period = 10
+ATR_PERIOD = 10
 
 # Parameter optimisation float precision
-float_precision = 0.01
-
+FLOAT_PRECISION = 0.01
 
 # Stock picker parameters
-training_period_stockpick_start = '2024-01-01' # Need to be longer period
-stock_pick_validation_date = '2024-08-30'
+TRAINING_PERIOD_STOCKPICK_START = '2024-01-01' # Need to be longer period
+STOCK_PICKER_VALIDATION_DATE = '2024-08-30'
