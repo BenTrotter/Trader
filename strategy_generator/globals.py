@@ -19,29 +19,29 @@ ALPACA_DATA_SOURCE = True
 # Choose dates
 TRAINING_PERIOD_START = '2024-09-01'
 TRAINING_PERIOD_END = '2024-09-03'
-UNSEEN_PERIOD_START = '2024-08-03'
-UNSEEN_PERIOD_END = '2024-08-04'
+UNSEEN_PERIOD_START = '2024-09-03'
+UNSEEN_PERIOD_END = '2024-09-04'
 
 # Choose interval
 YFINANCE_INTERVAL = '5m'
 ALPACA_INTERVAL = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-NUMBER_OF_TRIALS = 25
+NUMBER_OF_TRIALS = 100
 
 # Objectives - Only two can be chosen at the moment
 MULTI_OBJECTIVE = True
 NORMALISED_PROFIT = True
-SHARPE_RATIO_OBJECTIVE = True
-NUM_WINNING_TRADES_OBJECTIVE = False
+SHARPE_RATIO_OBJECTIVE = False
+NUM_WINNING_TRADES_OBJECTIVE = True
 
 # Objectives - objective weighting
-WEIGHT_OBJECTIVE_1 = 0.6
-WEIGHT_OBJECTIVE_2 = 0.4
+WEIGHT_OBJECTIVE_1 = 0.5
+WEIGHT_OBJECTIVE_2 = 0.5
 
 # Performance metric
 RISK_FREE_RATE = 0.021
-WINNING_TRADES_PARAM = 8
+WINNING_TRADES_PARAM = 4
 
 # Take profit / stop loss calculation method and parameters
 CLOSE_POSITION_WITH_SLTP = True # Boolean to set whether trades can be closed with sl/tp or only sell signal
