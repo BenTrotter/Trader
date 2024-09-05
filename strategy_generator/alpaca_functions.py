@@ -67,9 +67,11 @@ def analyse_latest_alpaca_bar(trading_session, trade, latest_bar):
         elif CLOSE_POSITION_WITH_SLTP:
             if latest_bar['High'] >= trade.take_profit_price:
                 trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached take profit")) # Close Long
+                close_trade_alpaca() # TODO remove so alpaca does automatically
                 trade = None
             elif latest_bar['Low'] <= trade.stop_loss_price:
                 trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached stop loss")) # Close Long
+                close_trade_alpaca() # TODO remove so alpaca does automatically
                 trade = None
 
 
