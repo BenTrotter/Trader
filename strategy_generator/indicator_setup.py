@@ -98,9 +98,6 @@ def generate_ADX_setup_signal(df, adx_window, strong_trend_threshold):
     # Step 5: Setup signal based on ADX and +DI > -DI (indicating a strong uptrend)
     df['Setup_Signal'] = np.where((df['ADX'] > strong_trend_threshold) & (df['+DI'] > df['-DI']), 1, 0)  # Buy signal for strong uptrend
     
-    # Drop all columns except original columns, 'Setup_Signal', and 'ADX'
-    df = df[['Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Setup_Signal', 'ADX']]
-
     return df
 
 

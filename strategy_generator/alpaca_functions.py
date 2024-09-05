@@ -60,16 +60,17 @@ def analyse_latest_alpaca_bar(trading_session, trade, latest_bar):
             open_trade_alpaca(trade) # Open Long
 
     elif trade is not None:
-        if latest_bar['High'] >= trade.take_profit_price:
-            trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached take profit")) # Close Long
-            trade = None
-        elif latest_bar['Combined_Signal'] == -1:
+        if latest_bar['Combined_Signal'] == -1:
             trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached sell signal")) # Close Long
             close_trade_alpaca()
             trade = None
-        elif latest_bar['Low'] <= trade.stop_loss_price:
-            trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached stop loss")) # Close Long
-            trade = None
+        elif CLOSE_POSITION_WITH_SLTP:
+            if latest_bar['High'] >= trade.take_profit_price:
+                trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached take profit")) # Close Long
+                trade = None
+            elif latest_bar['Low'] <= trade.stop_loss_price:
+                trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached stop loss")) # Close Long
+                trade = None
 
 
     return trade, trading_session

@@ -68,7 +68,7 @@ def objective(trial):
         weight_1 = WEIGHT_OBJECTIVE_1
         weight_2 = WEIGHT_OBJECTIVE_2
 
-        objective_1, objective_2 = backtest_strategy(False, df)
+        objective_1, objective_2 = backtest_strategy(False, strategy_df)
         
         # Apply the weightings
         weighted_objective_1 = weight_1 * objective_1

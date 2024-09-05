@@ -53,7 +53,7 @@ def calculate_atr(df):
 
 
 if __name__ == "__main__":
-    df = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
+    df = fetch_data("Training")
     df = (combined_strategy(df, 
                             filter_func=generate_SMA_filter_signal,
                             setup_func=generate_RSI_setup_signal,
