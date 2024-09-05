@@ -5,14 +5,18 @@ import pandas as pd
 import numpy as np  # Make sure to import numpy
 from alpaca_functions import *
 from trading_session import *
+from indicator_filter import *
+from indicator_setup import *
+from indicator_trigger import *
+from combined_strategy import combined_strategy
 from globals import *
 
 # Load environment variables from .env file
 load_dotenv(override=True)
 
 # Alpaca API credentials
-API_KEY = os.getenv('ALPACA_API_KEY')
-SECRET_KEY = os.getenv('ALPACA_SECRET_KEY')
+API_KEY = os.getenv('ALPACA_PERSONAL_API_KEY_ID')
+SECRET_KEY = os.getenv('ALPACA_PERSONAL_API_SECRET_KEY')
 
 print(API_KEY)
 print(SECRET_KEY)
@@ -69,8 +73,14 @@ async def quote_data_handler(data):
 
     if(len(copy) > 1): 
 
-        # TODO: Implement growing dataframe using trading strategy v1
-        # growing_df = moving_average_crossover_strategy(copy, short_window=1, long_window=2)
+        # TODO: Before starting the bot this needs to selected using the generate strategy
+        growing_df = combined_strategy(copy, 
+                            filter_func=generate_BollingerBands_filter_signal,
+                            setup_func=generate_Stochastic_setup_signal,
+                            trigger_func=generate_MACD_trigger_signal,
+                            filter_params={'bollinger_window': 13, 'num_std_dev': 0.58},
+                            setup_params={'k_period': 6, 'd_period': 7, 'stochastic_overbought': 61, 'stochastic_oversold': 44},
+                            trigger_params={'fast_period': 3, 'slow_period': 7, 'signal_period': 7})
 
         print("\nGrowing DataFrame:\n", growing_df.tail(2))
         print("\n")

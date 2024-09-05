@@ -94,22 +94,22 @@ def close_trade_alpaca():
 def analyse_latest_alpaca_bar(trading_session, trade, row, index):
     if trade != None:
         if trade.long:
-            if row['High'] >= trade.take_profit_price:
-                trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached take profit")) # Close Long
-                # close_trade_alpaca()
-                trade = None
-            elif row['Signal'] == -1:
+            # if row['High'] >= trade.take_profit_price:
+            #     trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached take profit")) # Close Long
+            #     # close_trade_alpaca()
+            #     trade = None
+            if row['Combined_Signal'] == -1:
                 trading_session.add_trade(trade.close_trade(index, row['Close'], "Next short signal reached")) # Close Long
                 close_trade_alpaca()
                 trade = None
                 # trade = open_trade(index, row['Close'], False) # Open short
-            elif row['Low'] <= trade.stop_loss_price:
-                trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached stop loss")) # Close Long
-                # close_trade_alpaca()
-                trade = None
+            # elif row['Low'] <= trade.stop_loss_price:
+            #     trading_session.add_trade(trade.close_trade(index, row['Close'], "Reached stop loss")) # Close Long
+            #     # close_trade_alpaca()
+            #     trade = None
 
     elif trade == None:
-        if row['Signal'] == 1:
+        if row['Combined_Signal'] == 1:
             trade = open_trade(index, row['Close'], True) # Open Long
 
     return trade, trading_session

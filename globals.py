@@ -56,3 +56,8 @@ atr_period = 10
 
 # Parameter optimisation float precision
 float_precision = 0.01
+
+
+# Stock picker parameters
+training_period_stockpick_start = '2024-01-01' # Need to be longer period
+stock_pick_validation_date = '2024-08-30'
