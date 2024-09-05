@@ -166,7 +166,7 @@ if __name__ == "__main__":
                            for k, v in best_params.items() if k.startswith(f'trigger_{best_trigger_func_name}_')}
 
     # Print the separated parameters to confirm correct extraction
-    print("Best filter parameters: ", best_filter_params)
+    print("\nBest filter parameters: ", best_filter_params)
     print("Best setup parameters: ", best_setup_params)
     print("Best trigger parameters: ", best_trigger_params)
 
