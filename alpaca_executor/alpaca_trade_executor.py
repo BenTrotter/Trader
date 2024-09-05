@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 import pandas as pd
 import numpy as np  # Make sure to import numpy
 from alpaca_functions import *
-from trading_session import *
-from indicator_filter import *
-from indicator_setup import *
-from indicator_trigger import *
-from combined_strategy import combined_strategy
+from strategy_generator.trading_session import *
+from strategy_generator.indicator_filter import *
+from strategy_generator.indicator_setup import *
+from strategy_generator.indicator_trigger import *
+from strategy_generator.combined_strategy import combined_strategy
 from globals import *
 
 # Load environment variables from .env file

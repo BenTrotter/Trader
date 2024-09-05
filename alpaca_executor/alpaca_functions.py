@@ -3,7 +3,7 @@ from alpaca.trading.requests import *
 from alpaca.trading.enums import OrderSide, TimeInForce
 import os
 from dotenv import load_dotenv
-from trading_session import *
+from strategy_generator.trading_session import *
 from globals import *
 
 # Load environment variables from .env file
