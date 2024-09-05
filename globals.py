@@ -17,7 +17,7 @@ yfinance_data_source = False
 alpaca_data_source = True
 
 # Choose dates
-training_period_start = '2024-07-10'
+training_period_start = '2024-07-01'
 training_period_end = '2024-08-27'
 unseen_period_start = '2024-08-27'
 unseen_period_end = '2024-08-31'
@@ -27,7 +27,7 @@ yfinance_interval = '5m'
 alpaca_interval = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-number_of_trials = 150
+number_of_trials = 200
 
 # Objectives - Only two can be chosen at the moment
 multi_objective = True
@@ -44,6 +44,8 @@ risk_free_rate = 0.021
 winning_trades_param = 8
 
 # Take profit / stop loss calculation method and parameters
+# TODO: implement logic to turn off sl tp
+close_position_method_SLTP = True 
 take_profit_method_ATR = True
 stop_loss_method_ATR = True
 take_profit_percentage = 0.04
