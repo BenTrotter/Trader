@@ -41,9 +41,9 @@ def plot_strategy(df, strategy_name, trades):
 
         # Append trade data to the respective lists
         open_times.append(trade.open_time)
-        open_prices.append(trade.open_price)
+        open_prices.append(trade.open_price_of_trade)
         close_times.append(trade.close_time)
-        close_prices.append(trade.close_price)
+        close_prices.append(trade.close_price_of_trade)
 
     # Plot all trade open points at once
     plt.scatter(open_times, open_prices, marker='^', color='green', alpha=1, label='Trade Open', s=100)

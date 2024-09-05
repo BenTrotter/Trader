@@ -76,35 +76,6 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
 
     df.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
 
-    df = calculate_atr(df)
-
-    return df
- 
-
-def calculate_atr(df):
-    """
-    Calculate the Average True Range (ATR) for a given DataFrame.
-
-    Args:
-        df (pd.DataFrame): DataFrame with 'High', 'Low', and 'Close' columns.
-
-    Returns:
-        pd.DataFrame: The input DataFrame with an additional 'ATR' column.
-    """
-    # Calculate True Range (TR)
-    high_low = df['High'] - df['Low']
-    high_close = abs(df['High'] - df['Close'].shift(1))
-    low_close = abs(df['Low'] - df['Close'].shift(1))
-    
-    # Combine to get the True Range - take the maximum of the three possible values
-    df['TR'] = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
-    
-    # Calculate the ATR
-    df['ATR'] = df['TR'].rolling(window=ATR_PERIOD, min_periods=1).mean()
-    
-    # Drop the intermediate 'TR' column
-    df.drop(columns=['TR'], inplace=True)
-
     return df
 
 

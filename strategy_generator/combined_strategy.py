@@ -7,6 +7,9 @@ from indicator_trigger import *
 
 
 def combined_strategy(df, filter_func, setup_func, trigger_func, filter_params={}, setup_params={}, trigger_params={}):
+
+    df = calculate_atr(df)
+
     # Apply filter, setup, and trigger functions to the DataFrame
     df = filter_func(df, **filter_params)
     df = setup_func(df, **setup_params)
@@ -17,6 +20,34 @@ def combined_strategy(df, filter_func, setup_func, trigger_func, filter_params={
         lambda row: 1 if all(row == 1) else (-1 if all(row == -1) else 0),
         axis=1
     )
+
+    return df
+
+
+
+def calculate_atr(df):
+    """
+    Calculate the Average True Range (ATR) for a given DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame with 'High', 'Low', and 'Close' columns.
+
+    Returns:
+        pd.DataFrame: The input DataFrame with an additional 'ATR' column.
+    """
+    # Calculate True Range (TR)
+    high_low = df['High'] - df['Low']
+    high_close = abs(df['High'] - df['Close'].shift(1))
+    low_close = abs(df['Low'] - df['Close'].shift(1))
+    
+    # Combine to get the True Range - take the maximum of the three possible values
+    df['TR'] = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
+    
+    # Calculate the ATR
+    df['ATR'] = df['TR'].rolling(window=ATR_PERIOD, min_periods=1).mean()
+    
+    # Drop the intermediate 'TR' column
+    df.drop(columns=['TR'], inplace=True)
 
     return df
 
