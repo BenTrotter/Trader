@@ -19,7 +19,7 @@ def open_trade(open_time, open_price, atr, trade_type):
         open_time=open_time,
         open_price=open_price,
         open_ATR = atr,
-        quantity=quantity,
+        quantity=QUANTITY,
         long=trade_type,
         short= not trade_type,
         take_profit_pct=TAKE_PROFIT_PERCENTAGE,
@@ -53,7 +53,7 @@ def backtest_strategy(display_backtester, data):
     closing_price_of_window = data["Close"].iloc[-1]
     buy_and_hold = ((closing_price_of_window - open_price_of_window) / open_price_of_window) * 100
 
-    trading_session = Trading_session(starting_balance)
+    trading_session = Trading_session(STARTING_BALANCE)
 
     # Iterate over DataFrame rows and populate list of Trades
     trade = None
@@ -77,11 +77,11 @@ def backtest_strategy(display_backtester, data):
 
 if __name__ == "__main__":
     
-    if alpaca_data_source:
-        data = fetch_historic_alpaca_data(training_period_start, training_period_end, alpaca_interval)
+    if ALPACA_DATA_SOURCE:
+        data = fetch_historic_alpaca_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, ALPACA_INTERVAL)
 
-    elif yfinance_data_source:
-        data = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+    elif YFINANCE_DATA_SOURCE:
+        data = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
 
     backtest_strategy(True,
                       combined_strategy(data, 

@@ -22,12 +22,12 @@ print(API_KEY)
 print(SECRET_KEY)
 
 # Initialize the WebSocket client
-if(crypto):
+if(CRYPTO):
     wss_client = CryptoDataStream(API_KEY, SECRET_KEY)
-    ticker = crypto_ticker
-elif(stock):
+    TICKER = CRYPTO_TICKER
+elif(STOCK):
     wss_client = StockDataStream(API_KEY, SECRET_KEY)
-    ticker = ticker
+    TICKER = TICKER
 
 # Initialize an empty DataFrame to store incoming bar data
 columns = ['symbol', 'timestamp', 'Open', 'High', 'Low', 'Close', 'Volume', 'trade_count', 'vwap']
@@ -92,7 +92,7 @@ async def quote_data_handler(data):
 
 
 # Subscribe to minute bar updates for SPY
-wss_client.subscribe_bars(quote_data_handler, ticker)
+wss_client.subscribe_bars(quote_data_handler, TICKER)
 
 
 wss_client.run()

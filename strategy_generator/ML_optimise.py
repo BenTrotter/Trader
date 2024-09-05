@@ -61,10 +61,10 @@ def objective(trial):
     )
 
     # Backtest strategy
-    if multi_objective:
+    if MULTI_OBJECTIVE:
         # Define weightings for each objective
-        weight_1 = weight_objective_1
-        weight_2 = weight_objective_2
+        weight_1 = WEIGHT_OBJECTIVE_1
+        weight_2 = WEIGHT_OBJECTIVE_2
 
         objective_1, objective_2 = backtest_strategy(False, strategy_df)
         
@@ -116,15 +116,15 @@ if __name__ == "__main__":
     df = fetch_data('Training')
 
     # Create a study object depending on the optimization type
-    if multi_objective:
+    if MULTI_OBJECTIVE:
         study = optuna.create_study(directions=['maximize', 'maximize'])
     else:
         study = optuna.create_study(direction='maximize')
     
     # Optimize the objective function
-    study.optimize(objective, n_trials=number_of_trials)
+    study.optimize(objective, n_trials=NUMBER_OF_TRIALS)
 
-    if multi_objective:
+    if MULTI_OBJECTIVE:
         # Handle multi-objective case
         print("Pareto front trials:")
         for trial in study.best_trials:

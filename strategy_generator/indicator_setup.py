@@ -62,7 +62,7 @@ def generate_Stochastic_setup_signal(df, k_period, d_period, stochastic_overboug
 
 
 def test_indicator():
-    df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+    df = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
     print(generate_Stochastic_setup_signal(df, k_period=14, d_period=3, stochastic_overbought=60, stochastic_oversold=40))
 
 

@@ -2,46 +2,46 @@ from alpaca.data.timeframe import TimeFrame
 
 
 # Choose stock or crypto
-stock = False
-ticker = "AMZN"
+STOCK = False
+TICKER = "AMZN"
 
-crypto = True
-crypto_ticker = "BTC/USD"
+CRYPTO = True
+CRYPTO_TICKER = "BTC/USD"
 
 # The quantity and starting balance to trade with
-quantity = 0.017
-starting_balance = 1000
+QUANTITY = 0.017
+STARTING_BALANCE = 1000
 
 # Choose a data source
-yfinance_data_source = False
-alpaca_data_source = True
+YFINANCE_DATA_SOURCE = False
+ALPACA_DATA_SOURCE = True
 
 # Choose dates
-training_period_start = '2024-07-01'
-training_period_end = '2024-08-27'
-unseen_period_start = '2024-08-27'
-unseen_period_end = '2024-08-31'
+TRAINING_PERIOD_START = '2024-07-01'
+TRAINING_PERIOD_END = '2024-08-27'
+UNSEEN_PERIOD_START = '2024-08-27'
+UNSEEN_PERIOD_END = '2024-08-31'
 
 # Choose interval
-yfinance_interval = '5m'
-alpaca_interval = TimeFrame.Minute
+YFINANCE_INTERVAL = '5m'
+ALPACA_INTERVAL = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-number_of_trials = 200
+NUMBER_OF_TRIALS = 200
 
 # Objectives - Only two can be chosen at the moment
-multi_objective = True
-normalised_profit = True
-sharpe_ratio_objective = True
-num_winning_trades_objectice = False
+MULTI_OBJECTIVE = True
+NORMALISED_PROFIT = True
+SHARPE_RATIO_OBJECTIVE = True
+NUM_WINNING_TRADES_OBJECTIVE = False
 
 # Objectives - objective weighting
-weight_objective_1 = 0.6
-weight_objective_2 = 0.4
+WEIGHT_OBJECTIVE_1 = 0.6
+WEIGHT_OBJECTIVE_2 = 0.4
 
 # Performance metric
-risk_free_rate = 0.021
-winning_trades_param = 8
+RISK_FREE_RATE = 0.021
+WINNING_TRADES_PARAM = 8
 
 # Take profit / stop loss calculation method and parameters
 # TODO: implement logic to turn off sl tp

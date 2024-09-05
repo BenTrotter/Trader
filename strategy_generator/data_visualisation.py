@@ -52,7 +52,7 @@ def plot_strategy(data, strategy_name, trades):
     plt.scatter(close_times, close_prices, marker='v', color='red', alpha=1, label='Trade Close', s=100)
 
     # Customize the plot
-    plt.title(f'Backtesting {ticker} Strategy: {strategy_name}')
+    plt.title(f'Backtesting {TICKER} Strategy: {strategy_name}')
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.legend(loc='best')

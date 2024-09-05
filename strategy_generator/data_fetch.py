@@ -23,20 +23,20 @@ def fetch_historic_yfinance_data(start_date, end_date, interval):
     """
     
     # Fetch data between start_date and end_date
-    download_df = yf.download(ticker, start=start_date, end=end_date, interval=interval)
+    df = yf.download(TICKER, start=start_date, end=end_date, interval=interval)
 
-    download_df.reset_index(inplace=True)
+    df.reset_index(inplace=True)
     
     # Check for 'Date' or 'Datetime' column and handle accordingly
-    if 'Date' in download_df.columns:
-        download_df['Date'] = pd.to_datetime(download_df['Date'])
-        download_df.rename(columns={'Date': 'Datetime'}, inplace=True)
-    elif 'Datetime' in download_df.columns:
-        download_df['Datetime'] = pd.to_datetime(download_df['Datetime'])
+    if 'Date' in df.columns:
+        df['Date'] = pd.to_datetime(df['Date'])
+        df.rename(columns={'Date': 'Datetime'}, inplace=True)
+    elif 'Datetime' in df.columns:
+        df['Datetime'] = pd.to_datetime(df['Datetime'])
 
-    download_df = calculate_atr(download_df, ATR_PERIOD)
+    df = calculate_atr(df)
     
-    return download_df
+    return df
 
 
 def fetch_historic_alpaca_data(period_start, period_end, interval):
@@ -53,18 +53,18 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
     period_end = pd.to_datetime(period_end)
     
     # Choose the client and request parameters based on the type of asset
-    if stock:
+    if STOCK:
         data_client = StockHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
         request_params = StockBarsRequest(
-            symbol_or_symbols=ticker,
+            symbol_or_symbols=TICKER,
             timeframe=interval,
             start=period_start,
             end=period_end
         )
-    elif crypto:
+    elif CRYPTO:
         data_client = CryptoHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
         request_params = CryptoBarsRequest(
-            symbol_or_symbols=crypto_ticker,
+            symbol_or_symbols=CRYPTO_TICKER,
             timeframe=interval,
             start=period_start,
             end=period_end
@@ -73,25 +73,24 @@ def fetch_historic_alpaca_data(period_start, period_end, interval):
         raise ValueError("Specify either stock or crypto as True.")
 
     # Fetch the data
-    download_df = data_client.get_crypto_bars(request_params).df if crypto else data_client.get_stock_bars(request_params).df
+    download_df = data_client.get_crypto_bars(request_params).df if CRYPTO else data_client.get_stock_bars(request_params).df
 
     # Reset the index to add a sequential index column and turn the current index columns into regular columns
     download_df.reset_index(inplace=True)
 
     download_df.columns = ['Symbol', 'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
 
-    download_df = calculate_atr(download_df, ATR_PERIOD)
+    download_df = calculate_atr(download_df)
 
     return download_df
  
 
-def calculate_atr(df, atr_period):
+def calculate_atr(df):
     """
     Calculate the Average True Range (ATR) for a given DataFrame.
 
     Args:
         df (pd.DataFrame): DataFrame with 'High', 'Low', and 'Close' columns.
-        period (int): The period over which to calculate the ATR (default is 14).
 
     Returns:
         pd.DataFrame: The input DataFrame with an additional 'ATR' column.
@@ -105,7 +104,7 @@ def calculate_atr(df, atr_period):
     df['TR'] = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
     
     # Calculate the ATR
-    df['ATR'] = df['TR'].rolling(window=atr_period, min_periods=1).mean()
+    df['ATR'] = df['TR'].rolling(window=ATR_PERIOD, min_periods=1).mean()
     
     # Drop the intermediate 'TR' column
     df.drop(columns=['TR'], inplace=True)
@@ -115,21 +114,21 @@ def calculate_atr(df, atr_period):
 
 def fetch_data(data_window_type):
 
-    if alpaca_data_source:
+    if ALPACA_DATA_SOURCE:
 
         if data_window_type == 'Training':
-            df = fetch_historic_alpaca_data(training_period_start, training_period_end, alpaca_interval)
+            df = fetch_historic_alpaca_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, ALPACA_INTERVAL)
 
         elif data_window_type == 'Unseen':
-            df = fetch_historic_alpaca_data(unseen_period_start, unseen_period_end, alpaca_interval)
+            df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START, UNSEEN_PERIOD_END, ALPACA_INTERVAL)
 
-    elif yfinance_data_source:
+    elif YFINANCE_DATA_SOURCE:
 
         if data_window_type == 'Training': 
-            df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+            df = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
 
         elif data_window_type == 'Unseen':
-            df = fetch_historic_yfinance_data(unseen_period_start, unseen_period_end, yfinance_interval)
+            df = fetch_historic_yfinance_data(UNSEEN_PERIOD_START, UNSEEN_PERIOD_END, YFINANCE_INTERVAL)
 
     return df
 

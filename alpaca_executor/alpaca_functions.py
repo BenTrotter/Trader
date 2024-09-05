@@ -10,12 +10,12 @@ from globals import *
 load_dotenv(override=True)
 
 # Initialize the WebSocket client
-if(crypto):
+if(CRYPTO):
     time_in_force = TimeInForce.GTC
-    ticker = crypto_ticker
-elif(stock):
+    TICKER = CRYPTO_TICKER
+elif(STOCK):
     time_in_force = TimeInForce.DAY
-    ticker = ticker
+    TICKER = TICKER
 
 # Alpaca API credentials
 API_KEY = os.getenv('ALPACA_API_KEY')
@@ -69,7 +69,7 @@ def open_trade(open_time, open_price, trade_type):
     trade = Trade(
         open_time=open_time,
         open_price=open_price,
-        quantity=quantity,
+        quantity=QUANTITY,
         long=trade_type,
         short= not trade_type,
         take_profit_pct=0.04,
@@ -77,10 +77,10 @@ def open_trade(open_time, open_price, trade_type):
 
     if(trade_type):
         print("Opening a long position")
-        order = prepare_open_long_order(ticker, quantity, trade.take_profit_price, trade.stop_loss_price)
+        order = prepare_open_long_order(TICKER, QUANTITY, trade.take_profit_price, trade.stop_loss_price)
     else:
         print("Opening a short position")
-        order = prepare_open_short_order(ticker, quantity, trade.take_profit_price, trade.stop_loss_price)
+        order = prepare_open_short_order(TICKER, QUANTITY, trade.take_profit_price, trade.stop_loss_price)
 
     send_order(order)
 

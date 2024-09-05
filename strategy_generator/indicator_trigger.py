@@ -56,7 +56,7 @@ def generate_MA_crossover_trigger_signal(df, short_window, long_window):
 
 
 def test_indicator():
-    df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+    df = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
     print(generate_MA_crossover_trigger_signal(df, 5, 20))
 
 

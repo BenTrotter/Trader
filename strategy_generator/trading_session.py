@@ -59,7 +59,7 @@ class Trading_session:
     def calculate_number_of_winning_trades(self):
         count = 0
         for tr in self.trades:
-            if tr.profit > winning_trades_param:
+            if tr.profit > WINNING_TRADES_PARAM:
                 count += 1
         self.number_of_winning_trades = count
 
@@ -105,7 +105,7 @@ class Trading_session:
         mean_return = np.mean(returns) / 100
 
         # Calculate the excess return over the risk-free rate
-        excess_return = mean_return - risk_free_rate
+        excess_return = mean_return - RISK_FREE_RATE
 
         # Calculate the standard deviation of returns
         std_dev = np.std(returns) / 100
@@ -122,13 +122,13 @@ class Trading_session:
     def get_objectives(self):
         results = []  
         
-        if normalised_profit:
+        if NORMALISED_PROFIT:
             results.append(self.normalized_profit)
 
-        if sharpe_ratio_objective:
+        if SHARPE_RATIO_OBJECTIVE:
             results.append(self.sharpe_ratio) 
 
-        if num_winning_trades_objectice:
+        if NUM_WINNING_TRADES_OBJECTIVE:
             results.append(self.number_of_winning_trades)
 
         return tuple(results)

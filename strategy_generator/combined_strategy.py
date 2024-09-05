@@ -22,7 +22,7 @@ def combined_strategy(df, filter_func, setup_func, trigger_func, filter_params={
 
 
 if __name__ == "__main__":
-    df = fetch_historic_yfinance_data(training_period_start, training_period_end, yfinance_interval)
+    df = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
     df = (combined_strategy(df, 
                             filter_func=generate_SMA_filter_signal,
                             setup_func=generate_RSI_setup_signal,
@@ -32,4 +32,4 @@ if __name__ == "__main__":
                             trigger_params={'fast_period': 12, 'slow_period': 26, 'signal_period': 9}))
     signal_columns = ['Datetime', 'Filter_Signal', 'Setup_Signal', 'Trigger_Signal', 'Combined_Signal', 'Close']
     print(df[signal_columns])
-    df[signal_columns].to_csv(os.path.abspath(os.getcwd())+'/'+ticker+'.csv')
+    df[signal_columns].to_csv(os.path.abspath(os.getcwd())+'/'+TICKER+'.csv')
