@@ -98,7 +98,16 @@ class Trading_session:
         Returns:
             float: The Sharpe Ratio, or 0 if it cannot be calculated.
 
-            
+        Calculation Method:
+        
+        Scale the risk free rate to be the risk free rate for the time between session_open_datetime and session_close_datetime
+        Extract the profit percentages from the trades
+        Calculate the mean returns from trades
+        Standard deviation of returns
+        excess return = Mean return - scaled risk free rate (scaled from annual rate)
+        Handle cases where std dev = 0
+        excess return / std dev
+        
         """
         # Extract the profit percentages from the trades
         returns = np.array([trade.profit_pct for trade in self.trades])
