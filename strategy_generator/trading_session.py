@@ -6,11 +6,15 @@ import numpy as np
 class Trading_session:
     def __init__(self, 
                  starting_balance: float,
+                 session_open_datetime: datetime = None,
+                 session_close_datetime: datetime = None,
                  ):
         self.starting_balance = starting_balance
         self.current_balance = starting_balance
+        self.session_open_datetime = session_open_datetime
         self.trades= []
         self.average_duration_of_trade = ""
+        self.session_closing_datetime = session_close_datetime
         self.percentage_change_of_strategy = 0.0
         self.number_of_winning_trades = 0
         self.normalized_profit = 0.0
@@ -93,6 +97,8 @@ class Trading_session:
         
         Returns:
             float: The Sharpe Ratio, or 0 if it cannot be calculated.
+
+            
         """
         # Extract the profit percentages from the trades
         returns = np.array([trade.profit_pct for trade in self.trades])

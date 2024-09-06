@@ -49,7 +49,7 @@ def backtest_strategy(display_backtester, df):
 
     buy_and_hold = calculate_buy_and_hold(df)
 
-    trading_session = Trading_session(STARTING_BALANCE)
+    trading_session = Trading_session(STARTING_BALANCE, df["Datetime"].loc[0], df["Datetime"].loc[-1])
     trade = None
 
     for index, row in df.iterrows():

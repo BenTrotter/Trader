@@ -17,23 +17,23 @@ YFINANCE_DATA_SOURCE = False
 ALPACA_DATA_SOURCE = True
 
 # Choose dates
-TRAINING_PERIOD_START = '2024-09-01'
-TRAINING_PERIOD_END = '2024-09-03'
-UNSEEN_PERIOD_START = '2024-09-03'
-UNSEEN_PERIOD_END = '2024-09-04'
+TRAINING_PERIOD_START = '2024-08-30'
+TRAINING_PERIOD_END = '2024-09-01'
+UNSEEN_PERIOD_START = '2024-09-01'
+UNSEEN_PERIOD_END = '2024-09-02'
 
 # Choose interval
 YFINANCE_INTERVAL = '5m'
 ALPACA_INTERVAL = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-NUMBER_OF_TRIALS = 100
+NUMBER_OF_TRIALS = 300
 
 # Objectives - Only two can be chosen at the moment
-MULTI_OBJECTIVE = True
-NORMALISED_PROFIT = True
-SHARPE_RATIO_OBJECTIVE = False
-NUM_WINNING_TRADES_OBJECTIVE = True
+MULTI_OBJECTIVE = False
+NORMALISED_PROFIT = False
+SHARPE_RATIO_OBJECTIVE = True
+NUM_WINNING_TRADES_OBJECTIVE = False
 
 # Objectives - objective weighting
 WEIGHT_OBJECTIVE_1 = 0.5
@@ -46,7 +46,7 @@ WINNING_TRADES_PARAM = 4
 # Take profit / stop loss calculation method and parameters
 CLOSE_POSITION_WITH_SLTP = True # Boolean to set whether trades can be closed with sl/tp or only sell signal
 RISK_REWARD_RATIO = 4 # sets the take profit / stop loss ratio
-ATR_MULTIPLIER = 1.5 # sets the multiple of the average true range to calculate the stop loss
+ATR_MULTIPLIER = 1.8 # sets the multiple of the average true range to calculate the stop loss
 
 # Choose period for ATR
 ATR_PERIOD = 10
