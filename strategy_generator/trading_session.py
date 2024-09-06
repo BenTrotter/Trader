@@ -85,6 +85,42 @@ class Trading_session:
         self.normalized_profit = (compounded_return - 1) * 100
     
 
+    # Function to calculate Sharpe Ratio
+    def calculate_sharpe_ratio_v2(self):
+        excess_returns = []
+        sharpe_cap = 3.0
+        
+        if len(self.trades) == 0:
+            return 0
+        # Calculate excess returns for each trade
+        for trade in self.trades:
+            # Adjusted risk-free return for the time window of the trade
+            delta_days = (trade.close_time - trade.open_time).days
+            annual_rate_decimal = ANNUAL_RISK_FREE_RATE / 100
+            risk_free_return = (1 + annual_rate_decimal) ** (delta_days / 365) - 1
+            
+            # Excess return is the trade profit minus the risk-free return
+            excess_return = trade.profit - risk_free_return
+            excess_returns.append(excess_return)
+        
+        if len(excess_returns) == 0:
+            return 0.0
+        
+        mean_excess_return = np.mean(excess_returns)
+        std_excess_return = np.std(excess_returns)
+        
+        # Handle zero standard deviation case
+        if std_excess_return == 0:
+            if mean_excess_return == 0:
+                return np.nan  # No return, no risk
+            else:
+                return sharpe_cap  
+        
+        sharpe_ratio = mean_excess_return / std_excess_return
+
+        self.sharpe_ratio = min(sharpe_ratio, sharpe_cap)
+
+
     def calculate_sharpe_ratio(self):
         """
         Calculate the Sharpe Ratio for the trading session.
@@ -109,6 +145,10 @@ class Trading_session:
         excess return / std dev
         
         """
+        delta_days = (self.session_closing_datetime - self.session_open_datetime).days
+        annual_rate_decimal = ANNUAL_RISK_FREE_RATE / 100
+        adjusted_return_value = (1 + annual_rate_decimal) ** (delta_days / 365) - 1
+
         # Extract the profit percentages from the trades
         returns = np.array([trade.profit_pct for trade in self.trades])
 
@@ -120,7 +160,7 @@ class Trading_session:
         mean_return = np.mean(returns) / 100
 
         # Calculate the excess return over the risk-free rate
-        excess_return = mean_return - ANNUAL_RISK_FREE_RATE
+        excess_return = mean_return - adjusted_return_value
 
         # Calculate the standard deviation of returns
         std_dev = np.std(returns) / 100
@@ -157,7 +197,7 @@ class Trading_session:
                 f"Average Trade Duration: {self.average_duration_of_trade}\n"
                 f"Strategy percentage change: {self.percentage_change_of_strategy:.2f}%\n"
                 f"Normalized Profit: {self.normalized_profit:.2f}%\n"
-                f"Sharpe Ratio: {self.sharpe_ratio:.2f}%\n")
+                f"Sharpe Ratio: {self.sharpe_ratio:.2f}\n")
 
 
 class Trade(Trading_session):

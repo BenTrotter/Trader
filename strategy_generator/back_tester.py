@@ -49,7 +49,7 @@ def backtest_strategy(display_backtester, df):
 
     buy_and_hold = calculate_buy_and_hold(df)
 
-    trading_session = Trading_session(STARTING_BALANCE, df["Datetime"].loc[0], df["Datetime"].loc[-1])
+    trading_session = Trading_session(STARTING_BALANCE, df["Datetime"].iloc[0], df["Datetime"].iloc[-1])
     trade = None
 
     for index, row in df.iterrows():
@@ -59,7 +59,7 @@ def backtest_strategy(display_backtester, df):
     trading_session.calculate_average_duration()
     trading_session.calculate_number_of_winning_trades()
     trading_session.calculate_normalized_profit()
-    trading_session.calculate_sharpe_ratio()
+    trading_session.calculate_sharpe_ratio_v2()
     
     if display_backtester:
         trading_session.display_trades()

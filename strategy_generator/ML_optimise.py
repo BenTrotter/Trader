@@ -137,7 +137,7 @@ if __name__ == "__main__":
     else:
         # Handle single-objective case
         print("Best parameters: ", study.best_params)
-        print("Best profit (maximized): ", study.best_value)
+        print("Best value (maximized): ", study.best_value)
 
         # Plot optimization history and parameter importances
         fig = vis.plot_optimization_history(study)
