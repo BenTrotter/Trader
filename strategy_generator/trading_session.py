@@ -120,7 +120,7 @@ class Trading_session:
         mean_return = np.mean(returns) / 100
 
         # Calculate the excess return over the risk-free rate
-        excess_return = mean_return - RISK_FREE_RATE
+        excess_return = mean_return - ANNUAL_RISK_FREE_RATE
 
         # Calculate the standard deviation of returns
         std_dev = np.std(returns) / 100

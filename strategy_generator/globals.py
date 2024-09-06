@@ -40,7 +40,7 @@ WEIGHT_OBJECTIVE_1 = 0.5
 WEIGHT_OBJECTIVE_2 = 0.5
 
 # Performance metric
-RISK_FREE_RATE = 0.021
+ANNUAL_RISK_FREE_RATE = 4
 WINNING_TRADES_PARAM = 4
 
 # Take profit / stop loss calculation method and parameters
