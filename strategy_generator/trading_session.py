@@ -209,6 +209,7 @@ class Trade(Trading_session):
                  open_time: datetime = None,
                  close_time: datetime = None,
                  quantity: float = 1,
+                 alpaca_order_id: str = None
                  ):
         self.open_time = open_time
         self.close_time = close_time
@@ -223,6 +224,7 @@ class Trade(Trading_session):
         self.duration = 0
         self.profit = 0
         self.close_reason = ""
+        self.alpaca_order_id = alpaca_order_id
     
     def calculate_value_of_trade(self) -> float:
         """
@@ -283,6 +285,7 @@ class Trade(Trading_session):
         # Prepare the data for tabulation
         print("\n")
         table_data = [
+            ["Alpaca Order ID", f"{self.alpaca_order_id}" if self.alpaca_order_id is not None else "N/A"],
             ["Open Time", self.open_time],
             ["Close Time", self.close_time],
             ["Open Price", f"${self.open_price_of_trade:.2f}"],

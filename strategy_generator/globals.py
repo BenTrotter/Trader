@@ -9,7 +9,7 @@ CRYPTO = True
 CRYPTO_TICKER = "BTC/USD"
 
 # The quantity and starting balance to trade with
-QUANTITY = 0.017
+QUANTITY = 0.001
 STARTING_BALANCE = 1000
 
 # Choose a data source
@@ -30,8 +30,8 @@ ALPACA_INTERVAL = TimeFrame.Minute
 NUMBER_OF_TRIALS = 300
 
 # Objectives - Only two can be chosen at the moment
-MULTI_OBJECTIVE = False
-NORMALISED_PROFIT = False
+MULTI_OBJECTIVE = True
+NORMALISED_PROFIT = True
 SHARPE_RATIO_OBJECTIVE = True
 NUM_WINNING_TRADES_OBJECTIVE = False
 
@@ -44,7 +44,7 @@ ANNUAL_RISK_FREE_RATE = 4
 WINNING_TRADES_PARAM = 4
 
 # Take profit / stop loss calculation method and parameters
-CLOSE_POSITION_WITH_SLTP = True # Boolean to set whether trades can be closed with sl/tp or only sell signal
+CLOSE_POSITION_WITH_SLTP = False # Boolean to set whether trades can be closed with sl/tp or only sell signal
 RISK_REWARD_RATIO = 4 # sets the take profit / stop loss ratio
 ATR_MULTIPLIER = 1.8 # sets the multiple of the average true range to calculate the stop loss
 
