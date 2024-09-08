@@ -45,7 +45,7 @@ def log_trade_info(take_profit_price, stop_loss_price, order_response):
         logging.info(f"Order Status: {order_details.status}")
 
         if order_details.filled_avg_price:
-            logging.info(f"Bought at: ${order_details.filled_avg_price:.2f}")
+            logging.info(f"Bought at: ${float(order_details.filled_avg_price):.2f}")
         else:
             logging.info("Order not filled yet.")
     except Exception as e:
@@ -156,7 +156,7 @@ def get_and_show_open_positions():
 
 def get_order_details_by_id(order_id):
     try:
-        order_details = trading_client.get_order(order_id)
+        order_details = trading_client.get_order_by_id(order_id)
         return order_details
     except Exception as e:
         logging.error(f"Error retrieving order details: {e}")

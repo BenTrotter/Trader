@@ -69,7 +69,7 @@ async def quote_data_handler(df):
         trading_session.display_trades()
         trading_session.calculate_percentage_change_of_strategy()
         print(trading_session)
-        print(f"\n\nRemeber to check Alpaca trading dashboard for any remaining open trades and handle appropriately\n\n")
+        print(f"\n\nRemember to check Alpaca trading dashboard for any remaining open trades and handle appropriately\n\n")
         sys.exit(0)
         return
 
@@ -90,7 +90,7 @@ async def quote_data_handler(df):
 
     if len(copy) > 1:
         growing_strategy_df = strategy(copy)
-        print("\nGrowing strategy DataFrame:\n", growing_strategy_df[['Symbol', 'Datetime', 'Close', 'Filter_Signal', 'Setup_Signal', 'Trigger_Signal', 'Combined_Signal']].tail(5))
+        print("\nGrowing strategy DataFrame:\n", growing_strategy_df[['Symbol', 'Datetime', 'Close', 'Filter_Signal', 'Setup_Signal', 'Trigger_Signal', 'Combined_Signal']].tail(1))
         trade, trading_session = analyse_latest_alpaca_bar(trading_session, trade, growing_strategy_df.iloc[-1])
 
 
