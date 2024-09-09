@@ -16,7 +16,7 @@ import signal
 shutdown_flag = False
 
 def prepopulate_df(count_back):
-    period_end = datetime.now(timezone.utc)
+    period_end = datetime.now(timezone.utc) -  (15 * pd.Timedelta(ALPACA_INTERVAL.value))
     period_start = period_end - (count_back * pd.Timedelta(ALPACA_INTERVAL.value))
     df = fetch_historic_alpaca_data(period_start, period_end, ALPACA_INTERVAL)
     return df
@@ -26,10 +26,10 @@ def strategy(df):
     return combined_strategy(df,
                              filter_func=generate_BollingerBands_filter_signal,
                              setup_func=generate_Stochastic_setup_signal,
-                             trigger_func=generate_MACD_trigger_signal,
-                             filter_params={'bollinger_window': 13, 'num_std_dev': 0.58},
-                             setup_params={'k_period': 6, 'd_period': 7, 'stochastic_overbought': 61, 'stochastic_oversold': 44},
-                             trigger_params={'fast_period': 3, 'slow_period': 7, 'signal_period': 7})
+                             trigger_func=generate_parabolic_sar_trigger_signal,
+                             filter_params={'bollinger_window': 9, 'num_std_dev': 0.96},
+                             setup_params={'k_period': 12, 'd_period': 6, 'stochastic_overbought': 57, 'stochastic_oversold': 45},
+                             trigger_params={'initial_af': 0, 'max_af': 0, 'step_af': 0})
 
 def handle_shutdown_signal(signal_number, frame):
     global shutdown_flag

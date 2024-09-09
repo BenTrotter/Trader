@@ -263,13 +263,13 @@ class Trade(Trading_session):
         ATR_stop_loss_distance = self.open_ATR * ATR_MULTIPLIER
         ATR_take_profit_distance = ATR_stop_loss_distance * RISK_REWARD_RATIO
         ATR_take_profit_price = self.open_price_of_trade + ATR_take_profit_distance
-        return ATR_take_profit_price
+        return round(ATR_take_profit_price, 2)
     
 
     def calculate_ATR_stop_loss_price(self):
         ATR_stop_loss_distance = self.open_ATR * ATR_MULTIPLIER
         ATR_stop_loss_price = self.open_price_of_trade - ATR_stop_loss_distance
-        return ATR_stop_loss_price
+        return round(ATR_stop_loss_price, 2)
 
 
     def close_trade(self, close_time, close_price, close_reason):

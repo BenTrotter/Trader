@@ -3,13 +3,13 @@ from alpaca.data.timeframe import TimeFrame
 
 # Choose stock or crypto
 STOCK = True
-TICKER = "AMT"
+TICKER = "CAVA"
 
 CRYPTO = False
-CRYPTO_TICKER = "BTC/USD"
+CRYPTO_TICKER = "ETH/USD"
 
 # The quantity and starting balance to trade with
-QUANTITY = 4
+QUANTITY = 1
 STARTING_BALANCE = 1000
 
 # Choose a data source
@@ -17,17 +17,17 @@ YFINANCE_DATA_SOURCE = False
 ALPACA_DATA_SOURCE = True
 
 # Choose dates
-TRAINING_PERIOD_START = '2024-09-02'
-TRAINING_PERIOD_END = '2024-09-05'
-UNSEEN_PERIOD_START = '2024-09-05'
-UNSEEN_PERIOD_END = '2024-09-06'
+TRAINING_PERIOD_START = '2024-09-01'
+TRAINING_PERIOD_END = '2024-09-09'
+UNSEEN_PERIOD_START = '2024-09-06'
+UNSEEN_PERIOD_END = '2024-09-07'
 
 # Choose interval
 YFINANCE_INTERVAL = '5m'
 ALPACA_INTERVAL = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-NUMBER_OF_TRIALS = 300
+NUMBER_OF_TRIALS = 200
 
 # Objectives - Only two can be chosen at the moment
 MULTI_OBJECTIVE = True
@@ -44,7 +44,7 @@ ANNUAL_RISK_FREE_RATE = 4
 WINNING_TRADES_PARAM = 1
 
 # Take profit / stop loss calculation method and parameters
-CLOSE_POSITION_WITH_SLTP = False # Boolean to set whether trades can be closed with sl/tp or only sell signal
+CLOSE_POSITION_WITH_SLTP = True # Boolean to set whether trades can be closed with sl/tp or only sell signal
 RISK_REWARD_RATIO = 4 # sets the take profit / stop loss ratio
 ATR_MULTIPLIER = 1.5 # sets the multiple of the average true range to calculate the stop loss
 
