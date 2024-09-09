@@ -135,8 +135,11 @@ def open_trade_alpaca(trade):
 
 def close_alpaca_trade(trade):
     """
-    First attempts to close by order id, if this fails it attempts to close all open positions.
+    First checks if order already closed. If not then attempts to close by order id, if this fails it attempts to close all open positions.
     """
+    if is_order_closed(trade.alpaca_order_id):
+        print("Alpaca order is already closed") # TODO to make the trade card more accurate we should populate it with the actual close details from alpaca, same goes for the other close methods
+        return True
     close_trade_successful = close_trade_by_order_id(trade)
     if close_trade_successful:
         print(trade)
@@ -236,6 +239,20 @@ def get_open_position():
             return position
     return None
 
+def is_order_closed(order_id):
+    try:
+        # Retrieve the order details using the order_id
+        order = get_order_details_by_id(order_id)
+        # Check if the order status is 'filled' or 'canceled'
+        if order.status in ['filled', 'canceled']:
+            return True
+        return False
+    except Exception as e:
+        # Handle exceptions such as order not found or API errors
+        print(f"An error occurred: {e}")
+        return False
+
+
 def get_current_buying_power():
     account = trading_client.get_account()
     buying_power = float(account.buying_power)
@@ -277,9 +294,7 @@ def analyse_latest_alpaca_bar(trading_session, trade, latest_bar):
 
 
 if __name__ == "__main__":
-    print("\n\nOpening a long position")
-    order_response = prepare_and_submit_open_long_order()
-    if order_response:
-        log_trade_info(0.0, 0.0, order_response)
-    else:
-        logging.error(f"Failed to submit order for {TICKER}")
+    # get_and_show_open_positions()
+    print(get_order_details_by_id("55c592f7-17bd-4df9-9700-c50b7f396011"))
+    if is_order_closed("55c592f7-17bd-4df9-9700-c50b7f396011"):
+        print("CLOSED")
