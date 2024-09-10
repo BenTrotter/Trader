@@ -184,7 +184,6 @@ if __name__ == "__main__":
     
     backtest_strategy(True, best_strategy_df)
 
-
     unseen_data = fetch_data('Unseen')
 
     unseen_strategy_df = combined_strategy(
@@ -198,3 +197,11 @@ if __name__ == "__main__":
     )
 
     backtest_strategy(True, unseen_strategy_df)
+
+    # Print the separated parameters at the end to confirm correct extraction and to populate bot
+    print("\nBest filter function: ", best_filter_func_name)
+    print("Best setup function: ", best_setup_func_name)
+    print("Best trigger function: ", best_trigger_func_name)
+    print("\nBest filter parameters: ", best_filter_params)
+    print("Best setup parameters: ", best_setup_params)
+    print("Best trigger parameters: ", best_trigger_params)

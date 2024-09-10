@@ -7,6 +7,7 @@ from alpaca.common.exceptions import APIError
 from dotenv import load_dotenv
 from trading_session import *
 from back_tester import open_trade
+import time
 import logging
 
 load_dotenv(override=True)
@@ -29,24 +30,47 @@ trading_client = TradingClient(API_KEY, SECRET_KEY, paper=True)
 # Setting up logging configuration (optional)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def log_trade_info(take_profit_price, stop_loss_price, order_response):
+def log_open_position_info(take_profit_price, stop_loss_price, order_response):
 
     logging.info("----------------------------------------")
     logging.info("Opened a long position:")
-    logging.info(f"Ticker: {TICKER}")
-    logging.info(f"Quantity: {QUANTITY}")
+    logging.info(f"Symbol: {order_response.symbol}")
+    logging.info(f"Quantity: {order_response.qty}")
 
     if take_profit_price != 0.0:
         logging.info(f"Take Profit Price: ${take_profit_price:.2f}")
         logging.info(f"Stop Loss Price: ${stop_loss_price:.2f}")
 
     try:
-        order_details = trading_client.get_order_by_id(str(order_response.id))
-        logging.info(f"Order ID: {order_details.id}")
-        logging.info(f"Order Status: {order_details.status}")
+        logging.info(f"Order ID: {order_response.id}")
+        logging.info(f"Asset ID: {order_response.asset_id}")
+        logging.info(f"Order Status: {order_response.status}")
 
-        if order_details.filled_avg_price:
-            logging.info(f"Bought at: ${float(order_details.filled_avg_price):.2f}")
+        if order_response.filled_avg_price:
+            logging.info(f"Bought at: ${float(order_response.filled_avg_price):.2f}")
+        else:
+            logging.info("Order not filled yet.")
+    except Exception as e:
+        logging.error(f"Error retrieving order status: {e}")
+
+    logging.info("----------------------------------------\n\n")
+
+
+def log_close_position_info(order_response):
+
+    print(f"\nClosing a long position as a sell signal has been reached\n")
+    logging.info("----------------------------------------")
+    logging.info("Closed a long position:")
+    logging.info(f"Symbol: {order_response.symbol}")
+    logging.info(f"Quantity: {order_response.qty}")
+
+    try:
+        logging.info(f"Order ID: {order_response.id}")
+        logging.info(f"Asset ID: {order_response.asset_id}")
+        logging.info(f"Order Status: {order_response.status}")
+
+        if order_response.filled_avg_price:
+            logging.info(f"Sold at: ${float(order_response.filled_avg_price):.2f}")
         else:
             logging.info("Order not filled yet.")
     except Exception as e:
@@ -107,22 +131,32 @@ def open_trade_alpaca(trade):
     Returns True if successful, False if not
     """
     if CLOSE_POSITION_WITH_SLTP:
-        print("\n\nOpening a long position, with stop loss / take profit")
+        print("\n\nOpening a long position, with stop loss / take profit\n")
         order_response = prepare_and_submit_bracket_order(trade.take_profit_price, trade.stop_loss_price)
+        time.sleep(5)
+        filled_order = get_order_details_by_id(str(order_response.id))
         if order_response:
-            log_trade_info(trade.take_profit_price, trade.stop_loss_price, order_response)
-            trade.alpaca_order_id = str(order_response.id)
+            log_open_position_info(trade.take_profit_price, trade.stop_loss_price, filled_order)
+            trade.alpaca_order_id = str(filled_order.id)
+            trade.open_price_of_trade = round(float(filled_order.filled_avg_price), 2)
+            trade.calculate_value_of_trade() # TODO its a bit messy these three are all being calculated twice, should reorder when we open system trade or the values we pass it. However requires a big rework as we calc the atr of the growing df from alpaca - might be fine to leace it
+            trade.calculate_ATR_stop_loss_price()
+            trade.calculate_ATR_take_profit_price()
         else:
             logging.error(f"Failed to submit order for {TICKER}")
             logging.error(f"A buy signal has been missed")
             return False
 
     else:
-        print("\n\nOpening a long position")
+        print("\n\nOpening a long position\n")
         order_response = prepare_and_submit_open_long_order()
+        time.sleep(5)
+        filled_order = get_order_details_by_id(str(order_response.id))
         if order_response:
-            log_trade_info(0.0, 0.0, order_response)
-            trade.alpaca_order_id = str(order_response.id)
+            log_open_position_info(0.0, 0.0, filled_order)
+            trade.alpaca_order_id = str(filled_order.id)
+            trade.open_price_of_trade = round(float(filled_order.filled_avg_price), 2)
+            trade.calculate_value_of_trade()
         else:
             logging.error(f"Failed to submit order for {TICKER}")
             logging.error(f"A buy signal has been missed")
@@ -137,12 +171,14 @@ def close_alpaca_trade(trade):
     """
     First checks if order already closed. If not then attempts to close by order id, if this fails it attempts to close all open positions.
     """
-    if is_order_closed(trade.alpaca_order_id):
-        print("Alpaca order is already closed") # TODO to make the trade card more accurate we should populate it with the actual close details from alpaca, same goes for the other close methods
+    positions = get_open_positions()
+    if len(positions) == 0:
+        print("\nAlpaca order is already closed (Should be due to stop loss / take profit)") # TODO this scenario will have an slightly innacurate trade card as we are not updating from Alpaca
         return True
-    close_trade_successful = close_trade_by_order_id(trade)
+    
+    close_trade_successful = close_open_position(positions[0], trade)
     if close_trade_successful:
-        print(trade)
+        # print(f"\nClosing position with asset id: {positions[0].asset_id}\n") # TODO add proper logging for this
         return True
     else:
         close_all_success = close_all_trades_alpaca()
@@ -152,40 +188,16 @@ def close_alpaca_trade(trade):
     return True
 
 
-def close_position(open_order):
+def close_open_position(position, trade):
     try:
-        # Place a market sell order to close the position
-        sell_order = trading_client.submit_order(
-            symbol=open_order.symbol,
-            qty=open_order.qty,
-            side=OrderSide.SELL,
-            type=OrderType.MARKET,
-            time_in_force=time_in_force
-        )
-        return sell_order
+        close_order = trading_client.close_position(position.asset_id)
+        time.sleep(5) # TODO may be a better way to do this
+        closed_order = get_order_details_by_id(close_order.id)
+        update_system_trade_with_alpaca_trade_details(closed_order, trade)
+        log_close_position_info(close_order)
+        return True
     except Exception as e:
-        logging.error(f"Error placing sell order: {e}")
-        return None
-
-
-def close_trade_by_order_id(trade):
-    try:
-        open_order = get_order_details_by_id(trade.alpaca_order_id)
-        
-        if open_order:
-            sell_order = close_position(open_order)
-            if sell_order:
-                logging.info(f"Successfully placed sell order to close position. Order ID: {sell_order.id}")
-                return True
-            else:
-                logging.error("Failed to place sell order.")
-                return False
-        else:
-            logging.error(f"No open position found for ticker: {TICKER}")
-            return False
-
-    except Exception as e:
-        logging.error(f"Error closing trade by order ID: {e}")
+        logging.error(f"Error closing position by order ID: {e}")
         return False
 
 
@@ -214,10 +226,15 @@ def close_all_trades_alpaca():
 
 # ********* GETTING OPEN POSITIONS ********** #
 
+def get_open_positions():
+    portfolio = trading_client.get_all_positions()
+    return portfolio
+
 def get_and_show_open_positions():
     portfolio = trading_client.get_all_positions()
     for position in portfolio:
         print("{} shares of {}".format(position.qty, position.symbol))
+        print(position)
     return portfolio
 
 def get_order_details_by_id(order_id):
@@ -239,18 +256,9 @@ def get_open_position():
             return position
     return None
 
-def is_order_closed(order_id):
-    try:
-        # Retrieve the order details using the order_id
-        order = get_order_details_by_id(order_id)
-        # Check if the order status is 'filled' or 'canceled'
-        if order.status in ['filled', 'canceled']:
-            return True
-        return False
-    except Exception as e:
-        # Handle exceptions such as order not found or API errors
-        print(f"An error occurred: {e}")
-        return False
+
+def update_system_trade_with_alpaca_trade_details(order, trade):
+        trade.close_price_of_trade = round(float(order.filled_avg_price), 2)
 
 
 def get_current_buying_power():
@@ -277,24 +285,36 @@ def analyse_latest_alpaca_bar(trading_session, trade, latest_bar):
             close_success = close_alpaca_trade(trade)
             if close_success:
                 trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached sell signal"))
+                print(trade)
                 trade = None
         elif CLOSE_POSITION_WITH_SLTP:
             if latest_bar['High'] >= trade.take_profit_price: # Close Long with take profit
                 close_success = close_alpaca_trade(trade)
                 if close_success:
                     trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached take profit"))
+                    print(trade)
                     trade = None
             elif latest_bar['Low'] <= trade.stop_loss_price: # Close Long with stop loss
                 close_success = close_alpaca_trade(trade)
                 if close_success:
                     trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached stop loss"))
+                    print(trade)
                     trade = None
 
     return trade, trading_session
 
 
 if __name__ == "__main__":
-    # get_and_show_open_positions()
-    print(get_order_details_by_id("55c592f7-17bd-4df9-9700-c50b7f396011"))
-    if is_order_closed("55c592f7-17bd-4df9-9700-c50b7f396011"):
-        print("CLOSED")
+    # market_order = MarketOrderRequest(
+    #                     symbol=TICKER,
+    #                     qty=QUANTITY,
+    #                     side=OrderSide.BUY,
+    #                     time_in_force=time_in_force)
+    # order_response = trading_client.submit_order(order_data=market_order)
+    close_order = trading_client.close_position("5344140c-ca01-4435-8a4a-217d4496bd35")
+    print(close_order)
+    # a = get_open_positions()[0]
+    # b = trading_client.close_position(get_open_positions()[0].asset_id)
+    # time.sleep(5)
+    # print(b)
+    # print(get_order_details_by_id(b.id))

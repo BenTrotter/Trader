@@ -24,12 +24,12 @@ def prepopulate_df(count_back):
 # TODO: THIS IS WHERE WE WILL DEFINE THE STRATEGY FOR THE BOT
 def strategy(df):
     return combined_strategy(df,
-                             filter_func=generate_BollingerBands_filter_signal,
-                             setup_func=generate_Stochastic_setup_signal,
-                             trigger_func=generate_parabolic_sar_trigger_signal,
-                             filter_params={'bollinger_window': 9, 'num_std_dev': 0.96},
-                             setup_params={'k_period': 12, 'd_period': 6, 'stochastic_overbought': 57, 'stochastic_oversold': 45},
-                             trigger_params={'initial_af': 0, 'max_af': 0, 'step_af': 0})
+                             filter_func=generate_SMA_filter_signal,
+                             setup_func=generate_ADX_setup_signal,
+                             trigger_func=generate_MACD_trigger_signal,
+                             filter_params={'sma_window': 10, 'look_back_period': 5},
+                             setup_params={'adx_window': 7, 'strong_trend_threshold': 28},
+                             trigger_params={'fast_period': 3, 'slow_period': 9, 'signal_period': 3})
 
 def handle_shutdown_signal(signal_number, frame):
     global shutdown_flag
@@ -68,6 +68,10 @@ async def quote_data_handler(df):
         print(f"\n\n ****** Displaying trading session ****** \n\n")
         trading_session.display_trades()
         trading_session.calculate_percentage_change_of_strategy()
+        trading_session.calculate_normalized_profit()
+        trading_session.calculate_number_of_winning_trades()
+        trading_session.calculate_average_duration()
+        trading_session.calculate_sharpe_ratio_v2
         print(trading_session)
         print(f"\n\nRemember to check Alpaca trading dashboard for any remaining open trades and handle appropriately\n\n")
         sys.exit(0)

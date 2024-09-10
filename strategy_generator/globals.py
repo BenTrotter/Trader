@@ -3,7 +3,7 @@ from alpaca.data.timeframe import TimeFrame
 
 # Choose stock or crypto
 STOCK = True
-TICKER = "CAVA"
+TICKER = "ZTS"
 
 CRYPTO = False
 CRYPTO_TICKER = "ETH/USD"
@@ -17,17 +17,17 @@ YFINANCE_DATA_SOURCE = False
 ALPACA_DATA_SOURCE = True
 
 # Choose dates
-TRAINING_PERIOD_START = '2024-09-01'
-TRAINING_PERIOD_END = '2024-09-09'
-UNSEEN_PERIOD_START = '2024-09-06'
-UNSEEN_PERIOD_END = '2024-09-07'
+TRAINING_PERIOD_START = '2024-09-02'
+TRAINING_PERIOD_END = '2024-09-6'
+UNSEEN_PERIOD_START = '2024-09-9'
+UNSEEN_PERIOD_END = '2024-09-10'
 
 # Choose interval
 YFINANCE_INTERVAL = '5m'
 ALPACA_INTERVAL = TimeFrame.Minute
 
 # ML parameter optimisation parameters
-NUMBER_OF_TRIALS = 200
+NUMBER_OF_TRIALS = 300
 
 # Objectives - Only two can be chosen at the moment
 MULTI_OBJECTIVE = True

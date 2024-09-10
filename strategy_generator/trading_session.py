@@ -274,7 +274,8 @@ class Trade(Trading_session):
 
     def close_trade(self, close_time, close_price, close_reason):
         self.close_time = close_time
-        self.close_price_of_trade = close_price
+        if self.close_price_of_trade == 0:
+            self.close_price_of_trade = close_price
         self.profit, self.profit_pct = self.calculate_profit()
         self.duration = self.calculate_duration()
         self.close_reason = close_reason
