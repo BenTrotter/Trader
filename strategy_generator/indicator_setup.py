@@ -2,6 +2,15 @@ import numpy as np
 from data_fetch import *
 
 
+def noop_setup(df):
+    """
+    No-operation setup that assigns a constant value of 9 to the 'Setup_Signal' column.
+    """
+    # Initialize the 'Filter_Signal' column with the value 9
+    df['Setup_Signal'] = 9
+    return df
+
+
 def generate_RSI_setup_signal(df, period, overbought_condition, oversold_condition):
     
     # Step 1: Calculate Price Changes

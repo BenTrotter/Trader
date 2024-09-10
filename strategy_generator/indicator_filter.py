@@ -3,6 +3,15 @@ import pandas as pd
 from data_fetch import *
 
 
+def noop_filter(df):
+    """
+    No-operation filter that assigns a constant value of 9 to the 'Filter_Signal' column.
+    """
+    # Initialize the 'Filter_Signal' column with the value 9
+    df['Filter_Signal'] = 9
+    return df
+
+
 def generate_SMA_filter_signal(df, sma_window, look_back_period):
     """
     Filter signal which checks that the previous 3 closing prices have been above the SMA with period defined as sma_window

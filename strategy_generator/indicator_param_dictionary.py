@@ -8,6 +8,12 @@ functions_info = {
     # Filter Functions
     
     'filter_functions': {
+        'noop_filter': {
+            'function': noop_filter,
+            'params': {
+
+            }
+        },
         'generate_SMA_filter_signal': {
             'function': generate_SMA_filter_signal,
             'params': {
@@ -35,6 +41,12 @@ functions_info = {
     # Set Up Functions
 
     'setup_functions': {
+        'noop_setup': {
+            'function': noop_setup,
+            'params': {
+
+            }
+        },
         'generate_RSI_setup_signal': {
             'function': generate_RSI_setup_signal,
             'params': {
@@ -64,6 +76,12 @@ functions_info = {
     # Trigger Functions
 
     'trigger_functions': {
+        'noop_trigger': {
+            'function': noop_trigger,
+            'params': {
+
+            }
+        },
         'generate_MACD_trigger_signal': {
             'function': generate_MACD_trigger_signal,
             'params': {

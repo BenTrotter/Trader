@@ -41,7 +41,7 @@ class TradingStrategy(BaseEstimator):
         )
 
         # Perform backtest and return a performance metric (e.g., total profit)
-        performance_metric = backtest_strategy(False, df)
+        performance_metric = backtest_strategy(False, False, df)
         
         # Ensure the performance metric is valid and handle NaN
         if np.isnan(performance_metric) or performance_metric <= 0:

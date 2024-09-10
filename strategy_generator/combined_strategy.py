@@ -17,7 +17,8 @@ def combined_strategy(df, filter_func, setup_func, trigger_func, filter_params={
 
     # Combine the signals into a final trading signal
     df['Combined_Signal'] = df[['Filter_Signal', 'Setup_Signal', 'Trigger_Signal']].apply(
-        lambda row: 1 if all(row == 1) else (-1 if all(row == -1) else 0),
+        lambda row: 1 if all(val == 1 for val in row if val != 9) else 
+                    (-1 if all(val == -1 for val in row if val != 9) else 0),
         axis=1
     )
 

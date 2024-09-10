@@ -3,6 +3,15 @@ import numpy as np
 from data_fetch import *
 
 
+def noop_trigger(df):
+    """
+    No-operation trigger that assigns a constant value of 9 to the 'Trigger_Signal' column.
+    """
+    # Initialize the 'Filter_Signal' column with the value 9
+    df['Trigger_Signal'] = 9
+    return df
+
+
 def generate_MACD_trigger_signal(df, fast_period, slow_period, signal_period):
 
     # Step 1: Calculate the fast and slow EMAs

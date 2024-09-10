@@ -2,7 +2,9 @@ from globals import *
 import optuna
 import optuna.visualization as vis
 import numpy as np
-from back_tester import backtest_strategy
+import pandas as pd
+from tabulate import tabulate
+from back_tester import backtest_strategy, backtest_strategy_returning_metrics
 from combined_strategy import combined_strategy
 from indicator_filter import *
 from indicator_setup import *
@@ -108,6 +110,116 @@ def select_best_from_pareto(study):
     return pareto_trials[best_index]
 
 
+def run_validation_on_pareto_front(study):
+    if MULTI_OBJECTIVE:
+        # Handle multi-objective case
+        print("\nPareto front trials:")
+        for trial in study.best_trials:
+            print(f"Trial #{trial.number}: Values = {trial.values}, Params = {trial.params}")
+
+        print(f"\n\nThere are {len(study.best_trials)} strategies on the Pareto front\n")
+
+        # Rerun all Pareto front trials on the unseen data
+        unseen_data_set = []
+        unseen_data_1 = fetch_data('Unseen 1')
+        unseen_data_set.append(unseen_data_1)
+        unseen_data_2 = fetch_data('Unseen 2')
+        unseen_data_set.append(unseen_data_2)
+        unseen_data_3 = fetch_data('Unseen 3')
+        unseen_data_set.append(unseen_data_3)
+
+        # Lists to store results for each trial
+        results_profit = []  # Results for Normalized Profit
+
+        # Store Buy and Hold results for only one run (since they are the same for each trial)
+        buy_and_hold_values = []
+
+        count = 1
+        for trial in study.best_trials:
+            print(f"\n***************** Pareto front strategy {count} ************************\n")
+            trial_params = trial.params
+
+            best_filter_func_name = trial_params['filter_func']
+            best_setup_func_name = trial_params['setup_func']
+            best_trigger_func_name = trial_params['trigger_func']
+
+            best_filter_func = functions_info['filter_functions'][best_filter_func_name]['function']
+            best_setup_func = functions_info['setup_functions'][best_setup_func_name]['function']
+            best_trigger_func = functions_info['trigger_functions'][best_trigger_func_name]['function']
+
+            best_filter_params = {k.replace(f'filter_{best_filter_func_name}_', ''): v 
+                                  for k, v in trial_params.items() if k.startswith(f'filter_{best_filter_func_name}_')}
+            best_setup_params = {k.replace(f'setup_{best_setup_func_name}_', ''): v 
+                                 for k, v in trial_params.items() if k.startswith(f'setup_{best_setup_func_name}_')}
+            best_trigger_params = {k.replace(f'trigger_{best_trigger_func_name}_', ''): v 
+                                   for k, v in trial_params.items() if k.startswith(f'trigger_{best_trigger_func_name}_')}
+
+            trial_profit = {'Trial #': count}
+            signaled_data_set = []
+            for unseen_data in unseen_data_set:
+                unseen_strategy_df = combined_strategy(
+                    unseen_data.copy(), 
+                    best_filter_func, 
+                    best_setup_func, 
+                    best_trigger_func, 
+                    filter_params=best_filter_params, 
+                    setup_params=best_setup_params, 
+                    trigger_params=best_trigger_params
+                )
+                signaled_data_set.append(unseen_strategy_df)
+
+            print("\nBest filter function: ", best_filter_func_name)
+            print("Best setup function: ", best_setup_func_name)
+            print("Best trigger function: ", best_trigger_func_name)
+            print("\nBest filter parameters: ", best_filter_params)
+            print("Best setup parameters: ", best_setup_params)
+            print("Best trigger parameters: ", best_trigger_params)
+            print("\n")
+
+            # Collect Buy and Hold results only once, since they're identical across trials
+            if count == 1:
+                for signaled_data in signaled_data_set:
+                    buy_and_hold, _ = backtest_strategy_returning_metrics(signaled_data)
+                    buy_and_hold_values.append(buy_and_hold)
+
+            # Backtest and collect profit % for each trial
+            itr = 1
+            normalized_profit_values = []
+            for signaled_data in signaled_data_set:
+                print(f"Unseen data trial {itr}")
+                backtest_strategy(False, True, signaled_data)
+                _, normalised_profit = backtest_strategy_returning_metrics(signaled_data)
+                normalized_profit_values.append(normalised_profit)
+                
+                # Add profit results to trial_profit
+                trial_profit[f'Unseen {itr} Profit %'] = normalised_profit
+                itr += 1
+
+            # Calculate and add averages to trial_profit
+            trial_profit['Average Profit %'] = round(np.mean(normalized_profit_values), 2)
+            results_profit.append(trial_profit)
+
+            print("\n******************************************************************\n")
+            count += 1
+
+        # Create a pandas DataFrame for Normalized Profit results
+        df_profit = pd.DataFrame(results_profit)
+
+        # Create a separate DataFrame for Buy and Hold results (shown once)
+        df_bnh = pd.DataFrame([buy_and_hold_values], columns=[f'   Unseen {i+1} B&H  ' for i in range(len(buy_and_hold_values))])
+        df_bnh['  Average B&H   '] = round(np.mean(buy_and_hold_values), 2)
+
+        # Print the Buy and Hold table (only once)
+        print("\nFinal Results:\n")
+        print(tabulate(df_bnh, headers='keys', tablefmt='grid'))
+        # Print the Profit % table (one row per trial)
+        print(tabulate(df_profit.drop(columns='Trial #'), headers='keys', tablefmt='grid'))
+        print("\n\n")
+
+
+
+
+
 if __name__ == "__main__":
 
     df = fetch_data('Training')
@@ -131,9 +243,9 @@ if __name__ == "__main__":
         fig = vis.plot_pareto_front(study)
         fig.show()
 
-        # Select the best trial based on distance to an ideal point
-        best_trial = select_best_from_pareto(study)
-        best_params = best_trial.params
+
+        run_validation_on_pareto_front(study)
+ 
     else:
         # Handle single-objective case
         print("Best parameters: ", study.best_params)
@@ -147,61 +259,3 @@ if __name__ == "__main__":
         fig.show()
 
         best_params = study.best_params
-
-    # Retrieve best function names and parameters
-    best_filter_func_name = best_params['filter_func']
-    best_setup_func_name = best_params['setup_func']
-    best_trigger_func_name = best_params['trigger_func']
-
-    best_filter_func = functions_info['filter_functions'][best_filter_func_name]['function']
-    best_setup_func = functions_info['setup_functions'][best_setup_func_name]['function']
-    best_trigger_func = functions_info['trigger_functions'][best_trigger_func_name]['function']
-
-    # Extract best parameters, removing the function prefixes but keeping parameter names intact
-    best_filter_params = {k.replace(f'filter_{best_filter_func_name}_', ''): v 
-                          for k, v in best_params.items() if k.startswith(f'filter_{best_filter_func_name}_')}
-    best_setup_params = {k.replace(f'setup_{best_setup_func_name}_', ''): v 
-                         for k, v in best_params.items() if k.startswith(f'setup_{best_setup_func_name}_')}
-    best_trigger_params = {k.replace(f'trigger_{best_trigger_func_name}_', ''): v 
-                           for k, v in best_params.items() if k.startswith(f'trigger_{best_trigger_func_name}_')}
-
-    # Print the separated parameters to confirm correct extraction
-    print("\nBest filter parameters: ", best_filter_params)
-    print("Best setup parameters: ", best_setup_params)
-    print("Best trigger parameters: ", best_trigger_params)
-
-
-    # Re-run with the best parameters to see how it performed
-    best_strategy_df = combined_strategy(
-        df.copy(), 
-        best_filter_func, 
-        best_setup_func, 
-        best_trigger_func, 
-        filter_params=best_filter_params, 
-        setup_params=best_setup_params, 
-        trigger_params=best_trigger_params
-    )
-    
-    backtest_strategy(True, True, best_strategy_df)
-
-    unseen_data = fetch_data('Unseen')
-
-    unseen_strategy_df = combined_strategy(
-        unseen_data, 
-        best_filter_func, 
-        best_setup_func, 
-        best_trigger_func, 
-        filter_params=best_filter_params, 
-        setup_params=best_setup_params, 
-        trigger_params=best_trigger_params
-    )
-
-    backtest_strategy(True, True, unseen_strategy_df)
-
-    # Print the separated parameters at the end to confirm correct extraction and to populate bot
-    print("\nBest filter function: ", best_filter_func_name)
-    print("Best setup function: ", best_setup_func_name)
-    print("Best trigger function: ", best_trigger_func_name)
-    print("\nBest filter parameters: ", best_filter_params)
-    print("Best setup parameters: ", best_setup_params)
-    print("Best trigger parameters: ", best_trigger_params)

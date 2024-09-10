@@ -45,7 +45,7 @@ def analyse_row(trading_session, trade, latest_bar):
     return trade, trading_session
 
 
-def backtest_strategy(display_backtester, df):
+def backtest_strategy(display_trades, display_trading_session, df):
 
     buy_and_hold = calculate_buy_and_hold(df)
 
@@ -61,13 +61,33 @@ def backtest_strategy(display_backtester, df):
     trading_session.calculate_normalized_profit()
     trading_session.calculate_sharpe_ratio_v2()
     
-    if display_backtester:
+    if display_trades:
         trading_session.display_trades()
+        plot_strategy(df, "Strategy", trading_session.trades)
+    if display_trading_session:
         print(trading_session)
         print(f"Buy and hold: {buy_and_hold}\n")
-        plot_strategy(df, "Strategy", trading_session.trades)
     
     return trading_session.get_objectives()
+
+
+def backtest_strategy_returning_metrics(df):
+
+    buy_and_hold = calculate_buy_and_hold(df)
+
+    trading_session = Trading_session(STARTING_BALANCE, df["Datetime"].iloc[0], df["Datetime"].iloc[-1])
+    trade = None
+
+    for index, row in df.iterrows():
+        trade, trading_session = analyse_row(trading_session, trade, row)
+
+    trading_session.calculate_percentage_change_of_strategy()
+    trading_session.calculate_average_duration()
+    trading_session.calculate_number_of_winning_trades()
+    trading_session.calculate_normalized_profit()
+    trading_session.calculate_sharpe_ratio_v2()
+    
+    return round(buy_and_hold, 2), round(trading_session.normalized_profit, 2)
 
 
 if __name__ == "__main__":
