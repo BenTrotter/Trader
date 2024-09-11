@@ -5,6 +5,7 @@ import pandas as pd
 from alpaca.data.live import StockDataStream, CryptoDataStream
 from alpaca_functions import *
 from trading_session import *
+from data_visualisation import *
 from indicator_filter import *
 from indicator_setup import *
 from indicator_trigger import *
@@ -24,12 +25,12 @@ def prepopulate_df(count_back):
 # TODO: THIS IS WHERE WE WILL DEFINE THE STRATEGY FOR THE BOT
 def strategy(df):
     return combined_strategy(df,
-                             filter_func=generate_SMA_filter_signal,
-                             setup_func=generate_ADX_setup_signal,
-                             trigger_func=generate_MACD_trigger_signal,
-                             filter_params={'sma_window': 10, 'look_back_period': 5},
-                             setup_params={'adx_window': 7, 'strong_trend_threshold': 28},
-                             trigger_params={'fast_period': 3, 'slow_period': 9, 'signal_period': 3})
+                             filter_func=noop_filter,
+                             setup_func=generate_Stochastic_setup_signal,
+                             trigger_func=noop_trigger,
+                             filter_params={},
+                             setup_params={'k_period': 6, 'd_period': 3, 'stochastic_overbought': 67, 'stochastic_oversold': 30},
+                             trigger_params={})
 
 def handle_shutdown_signal(signal_number, frame):
     global shutdown_flag
@@ -73,6 +74,7 @@ async def quote_data_handler(df):
         trading_session.calculate_average_duration()
         trading_session.calculate_sharpe_ratio_v2
         print(trading_session)
+        plot_strategy(growing_strategy_df, "Strategy", trading_session.trades)
         print(f"\n\nRemember to check Alpaca trading dashboard for any remaining open trades and handle appropriately\n\n")
         sys.exit(0)
         return
@@ -94,7 +96,7 @@ async def quote_data_handler(df):
 
     if len(copy) > 1:
         growing_strategy_df = strategy(copy)
-        print("\nGrowing strategy DataFrame:\n", growing_strategy_df[['Symbol', 'Datetime', 'Close', 'Filter_Signal', 'Setup_Signal', 'Trigger_Signal', 'Combined_Signal']].tail(1))
+        print("\nGrowing strategy DataFrame:\n", growing_strategy_df[['Symbol', 'Datetime', 'Low', 'High', 'Close', 'Filter_Signal', 'Setup_Signal', 'Trigger_Signal', 'Combined_Signal']].tail(1))
         trade, trading_session = analyse_latest_alpaca_bar(trading_session, trade, growing_strategy_df.iloc[-1])
 
 

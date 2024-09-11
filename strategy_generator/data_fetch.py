@@ -90,13 +90,19 @@ def fetch_data(data_window_type):
             df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START, UNSEEN_PERIOD_END, ALPACA_INTERVAL)
         
         elif data_window_type == 'Unseen 1':
-            df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START_1, UNSEEN_PERIOD_END_2, ALPACA_INTERVAL)
+            df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START_1, UNSEEN_PERIOD_END_1, ALPACA_INTERVAL)
 
         elif data_window_type == 'Unseen 2':
             df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START_2, UNSEEN_PERIOD_END_2, ALPACA_INTERVAL)
 
         elif data_window_type == 'Unseen 3':
             df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START_3, UNSEEN_PERIOD_END_3, ALPACA_INTERVAL)
+
+        elif data_window_type == 'Unseen 4':
+            df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START_4, UNSEEN_PERIOD_END_4, ALPACA_INTERVAL)
+
+        elif data_window_type == 'Unseen 5':
+            df = fetch_historic_alpaca_data(UNSEEN_PERIOD_START_5, UNSEEN_PERIOD_END_5, ALPACA_INTERVAL)
 
     elif YFINANCE_DATA_SOURCE:
 

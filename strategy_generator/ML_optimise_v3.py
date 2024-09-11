@@ -127,6 +127,10 @@ def run_validation_on_pareto_front(study):
         unseen_data_set.append(unseen_data_2)
         unseen_data_3 = fetch_data('Unseen 3')
         unseen_data_set.append(unseen_data_3)
+        unseen_data_4 = fetch_data('Unseen 4')
+        unseen_data_set.append(unseen_data_4)
+        # unseen_data_5 = fetch_data('Unseen 5')
+        # unseen_data_set.append(unseen_data_5)
 
         # Lists to store results for each trial
         results_profit = []  # Results for Normalized Profit
@@ -226,7 +230,7 @@ if __name__ == "__main__":
 
     # Create a study object depending on the optimization type
     if MULTI_OBJECTIVE:
-        study = optuna.create_study(directions=['maximize', 'maximize'])
+        study = optuna.create_study(directions=['maximize', 'maximize'], pruner=optuna.pruners.MedianPruner())
     else:
         study = optuna.create_study(direction='maximize')
     
@@ -240,8 +244,8 @@ if __name__ == "__main__":
             print(f"Trial #{trial.number}: Values = {trial.values}, Params = {trial.params}")
 
         # Plot Pareto front
-        fig = vis.plot_pareto_front(study)
-        fig.show()
+        # fig = vis.plot_pareto_front(study)
+        # fig.show()
 
 
         run_validation_on_pareto_front(study)

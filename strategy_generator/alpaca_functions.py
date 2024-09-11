@@ -134,8 +134,8 @@ def open_trade_alpaca(trade):
         print("\n\nOpening a long position, with stop loss / take profit\n")
         order_response = prepare_and_submit_bracket_order(trade.take_profit_price, trade.stop_loss_price)
         time.sleep(5)
-        filled_order = get_order_details_by_id(str(order_response.id))
         if order_response:
+            filled_order = get_order_details_by_id(str(order_response.id))
             log_open_position_info(trade.take_profit_price, trade.stop_loss_price, filled_order)
             trade.alpaca_order_id = str(filled_order.id)
             trade.open_price_of_trade = round(float(filled_order.filled_avg_price), 2)
@@ -151,8 +151,8 @@ def open_trade_alpaca(trade):
         print("\n\nOpening a long position\n")
         order_response = prepare_and_submit_open_long_order()
         time.sleep(5)
-        filled_order = get_order_details_by_id(str(order_response.id))
         if order_response:
+            filled_order = get_order_details_by_id(str(order_response.id))
             log_open_position_info(0.0, 0.0, filled_order)
             trade.alpaca_order_id = str(filled_order.id)
             trade.open_price_of_trade = round(float(filled_order.filled_avg_price), 2)
