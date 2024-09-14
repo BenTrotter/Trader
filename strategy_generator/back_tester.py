@@ -24,6 +24,29 @@ def calculate_buy_and_hold(df):
     return buy_and_hold
 
 
+def analyse_row_swing(trading_session, trade, latest_bar):
+    if trade is None:
+        if latest_bar['Combined_Signal'] == 1:
+            trade = open_trade(latest_bar['Datetime'], latest_bar['Close'], latest_bar['ATR']) # Open Long
+
+    elif trade is not None:
+        if CLOSE_POSITION_WITH_SLTP:
+            if latest_bar['High'] >= trade.take_profit_price:
+                trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached take profit")) # Close Long
+                trade = None
+            elif latest_bar['Low'] <= trade.stop_loss_price:
+                trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "Reached stop loss")) # Close Long
+                trade = None
+            else:
+                trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "End of day, closing")) # Close Long
+                trade = None
+        else:
+            trading_session.add_trade(trade.close_trade(latest_bar['Datetime'], latest_bar['Close'], "End of day, closing")) # Close Long
+            trade = None        
+
+    return trade, trading_session
+  
+
 def analyse_row(trading_session, trade, latest_bar):
 
     if trade is None:
@@ -53,7 +76,10 @@ def backtest_strategy(display_trades, display_trading_session, df):
     trade = None
 
     for index, row in df.iterrows():
-        trade, trading_session = analyse_row(trading_session, trade, row)
+        if INTRADAY_TRADING:
+            trade, trading_session = analyse_row(trading_session, trade, row)
+        elif SWING_TRADING:
+            trade, trading_session = analyse_row_swing(trading_session, trade, row)
 
     trading_session.calculate_percentage_change_of_strategy()
     trading_session.calculate_average_duration()
@@ -100,9 +126,9 @@ if __name__ == "__main__":
 
     backtest_strategy(True, True,
                       combined_strategy(data, 
-                            filter_func=generate_BollingerBands_filter_signal,
-                            setup_func=generate_ADX_setup_signal,
-                            trigger_func=generate_parabolic_sar_trigger_signal,
-                            filter_params={'bollinger_window': 19, 'num_std_dev': 2.05},
-                            setup_params={'adx_window': 25, 'strong_trend_threshold': 34},
-                            trigger_params={'initial_af': 0, 'max_af': 0, 'step_af': 0}))
+                            filter_func=noop_filter,
+                            setup_func=noop_setup,
+                            trigger_func=generate_MACD_trigger_signal,
+                            filter_params={},
+                            setup_params={},
+                            trigger_params={'fast_period': 1, 'slow_period': 6, 'signal_period': 3}))

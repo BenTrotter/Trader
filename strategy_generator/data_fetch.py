@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from globals import *
 from alpaca.data.historical import StockHistoricalDataClient, CryptoHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest, CryptoBarsRequest
+from alpaca.trading.requests import AssetStatus, AssetClass
 import pandas as pd
 import yfinance as yf
 
@@ -113,6 +114,22 @@ def fetch_data(data_window_type):
             df = fetch_historic_yfinance_data(UNSEEN_PERIOD_START, UNSEEN_PERIOD_END, YFINANCE_INTERVAL)
 
     return df
+
+
+def fetch_tradable_stocks():
+    load_dotenv(override=True)
+
+    ALPACA_PERSONAL_API_KEY_ID = os.getenv('ALPACA_PERSONAL_API_KEY_ID')
+    ALPACA_PERSONAL_API_SECRET_KEY = os.getenv('ALPACA_PERSONAL_API_SECRET_KEY')
+    data_client = StockHistoricalDataClient(ALPACA_PERSONAL_API_KEY_ID, ALPACA_PERSONAL_API_SECRET_KEY)
+    # Fetch tradable assets from Alpaca
+    assets = data_client.get_all_assets(
+        status=AssetStatus.ACTIVE,  # Only active assets
+        asset_class=AssetClass.US_EQUITY  # Focus on US equities
+    )
+
+    # Create a dictionary of all tradable tickers
+    alpaca_tickers = {asset.symbol: asset for asset in assets if asset.tradable}
 
 
 if __name__ == "__main__":
