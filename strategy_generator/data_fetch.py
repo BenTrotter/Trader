@@ -34,7 +34,7 @@ def fetch_historic_yfinance_data(start_date, end_date, interval):
     elif 'Datetime' in df.columns:
         df['Datetime'] = pd.to_datetime(df['Datetime'])
 
-    df = calculate_atr(df)
+    # df = calculate_atr(df)
     
     return df
 
