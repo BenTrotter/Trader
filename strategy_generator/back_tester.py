@@ -98,7 +98,7 @@ if __name__ == "__main__":
     elif YFINANCE_DATA_SOURCE:
         data = fetch_historic_yfinance_data(TRAINING_PERIOD_START, TRAINING_PERIOD_END, YFINANCE_INTERVAL)
 
-    backtest_strategy(True,
+    backtest_strategy(True, True,
                       combined_strategy(data, 
                             filter_func=generate_BollingerBands_filter_signal,
                             setup_func=generate_ADX_setup_signal,
