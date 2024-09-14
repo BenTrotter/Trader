@@ -1,5 +1,8 @@
 from alpaca.data.timeframe import TimeFrame
 
+# Choose trading method
+SWING_TRADING = True
+INTRADAY_TRADING = False
 
 # Choose stock or crypto
 STOCK = True
