@@ -4,7 +4,7 @@ import numpy as np
 from combined_strategy import combined_strategy
 from back_tester import backtest_strategy
 from data_fetch import fetch_data
-from indicator_param_dictionary import functions_info
+from strategy_generator.indicator_param_dict_intra import intra_functions_info
 from sklearn.metrics import make_scorer
 
 
@@ -32,9 +32,9 @@ class TradingStrategy(BaseEstimator):
         """
         df = combined_strategy(
             X.copy(),
-            functions_info['filter_functions'][self.filter_func_name]['function'],
-            functions_info['setup_functions'][self.setup_func_name]['function'],
-            functions_info['trigger_functions'][self.trigger_func_name]['function'],
+            intra_functions_info['filter_functions'][self.filter_func_name]['function'],
+            intra_functions_info['setup_functions'][self.setup_func_name]['function'],
+            intra_functions_info['trigger_functions'][self.trigger_func_name]['function'],
             filter_params=self.filter_params,
             setup_params=self.setup_params,
             trigger_params=self.trigger_params
@@ -81,15 +81,15 @@ import numpy as np
 
 # Define the parameter grid
 param_grid = {
-    'filter_func_name': list(functions_info['filter_functions'].keys()),
-    'setup_func_name': list(functions_info['setup_functions'].keys()),
-    'trigger_func_name': list(functions_info['trigger_functions'].keys()),
+    'filter_func_name': list(intra_functions_info['filter_functions'].keys()),
+    'setup_func_name': list(intra_functions_info['setup_functions'].keys()),
+    'trigger_func_name': list(intra_functions_info['trigger_functions'].keys()),
 }
 
 # Dynamically add function-specific parameter ranges to the grid
-for func_type, func_dict in [('filter', functions_info['filter_functions']),
-                             ('setup', functions_info['setup_functions']),
-                             ('trigger', functions_info['trigger_functions'])]:
+for func_type, func_dict in [('filter', intra_functions_info['filter_functions']),
+                             ('setup', intra_functions_info['setup_functions']),
+                             ('trigger', intra_functions_info['trigger_functions'])]:
     for func_name, func_info in func_dict.items():
         for param_name, (param_type, start, end) in func_info['params'].items():
             if param_type == 'int':

@@ -9,10 +9,19 @@ from combined_strategy import combined_strategy
 from indicator_filter import *
 from indicator_setup import *
 from indicator_trigger import *
-from indicator_param_dictionary import *
+from indicator_param_dict_intra import *
+from indicator_param_dict_swing import *
 
 
 def objective(trial):
+
+    # Define functions info depending on whether approach is intraday or swing trading
+    if SWING_TRADING:
+        functions_info = intra_functions_info
+    elif INTRADAY_TRADING:
+        functions_info = swing_functions_info
+    else:
+        raise ValueError("Unknown condition, cannot determine the function info")
 
     # Select a filter function
     filter_func_name = trial.suggest_categorical('filter_func', list(functions_info['filter_functions'].keys()))
@@ -147,9 +156,9 @@ def run_validation_on_pareto_front(study):
             best_setup_func_name = trial_params['setup_func']
             best_trigger_func_name = trial_params['trigger_func']
 
-            best_filter_func = functions_info['filter_functions'][best_filter_func_name]['function']
-            best_setup_func = functions_info['setup_functions'][best_setup_func_name]['function']
-            best_trigger_func = functions_info['trigger_functions'][best_trigger_func_name]['function']
+            best_filter_func = intra_functions_info['filter_functions'][best_filter_func_name]['function']
+            best_setup_func = intra_functions_info['setup_functions'][best_setup_func_name]['function']
+            best_trigger_func = intra_functions_info['trigger_functions'][best_trigger_func_name]['function']
 
             best_filter_params = {k.replace(f'filter_{best_filter_func_name}_', ''): v 
                                   for k, v in trial_params.items() if k.startswith(f'filter_{best_filter_func_name}_')}

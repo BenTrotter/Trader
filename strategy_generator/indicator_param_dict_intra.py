@@ -3,7 +3,7 @@ from indicator_setup import *
 from indicator_trigger import *
 
 # Define available functions and their parameter ranges
-functions_info = {
+intra_functions_info = {
 
     # Filter Functions
     

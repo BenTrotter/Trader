@@ -7,24 +7,24 @@ from combined_strategy import combined_strategy
 from indicator_filter import *
 from indicator_setup import *
 from indicator_trigger import *
-from indicator_param_dictionary import *
+from strategy_generator.indicator_param_dict_intra import *
 
 
 def objective(trial):
 
     # Select a filter function
-    filter_func_name = trial.suggest_categorical('filter_func', list(functions_info['filter_functions'].keys()))
-    filter_func_info = functions_info['filter_functions'][filter_func_name]
+    filter_func_name = trial.suggest_categorical('filter_func', list(intra_functions_info['filter_functions'].keys()))
+    filter_func_info = intra_functions_info['filter_functions'][filter_func_name]
     filter_func = filter_func_info['function']
     
     # Select a setup function
-    setup_func_name = trial.suggest_categorical('setup_func', list(functions_info['setup_functions'].keys()))
-    setup_func_info = functions_info['setup_functions'][setup_func_name]
+    setup_func_name = trial.suggest_categorical('setup_func', list(intra_functions_info['setup_functions'].keys()))
+    setup_func_info = intra_functions_info['setup_functions'][setup_func_name]
     setup_func = setup_func_info['function']
     
     # Select a trigger function
-    trigger_func_name = trial.suggest_categorical('trigger_func', list(functions_info['trigger_functions'].keys()))
-    trigger_func_info = functions_info['trigger_functions'][trigger_func_name]
+    trigger_func_name = trial.suggest_categorical('trigger_func', list(intra_functions_info['trigger_functions'].keys()))
+    trigger_func_info = intra_functions_info['trigger_functions'][trigger_func_name]
     trigger_func = trigger_func_info['function']
 
     # Dynamically suggest parameters for each selected function
@@ -153,9 +153,9 @@ if __name__ == "__main__":
     best_setup_func_name = best_params['setup_func']
     best_trigger_func_name = best_params['trigger_func']
 
-    best_filter_func = functions_info['filter_functions'][best_filter_func_name]['function']
-    best_setup_func = functions_info['setup_functions'][best_setup_func_name]['function']
-    best_trigger_func = functions_info['trigger_functions'][best_trigger_func_name]['function']
+    best_filter_func = intra_functions_info['filter_functions'][best_filter_func_name]['function']
+    best_setup_func = intra_functions_info['setup_functions'][best_setup_func_name]['function']
+    best_trigger_func = intra_functions_info['trigger_functions'][best_trigger_func_name]['function']
 
     # Extract best parameters, removing the function prefixes but keeping parameter names intact
     best_filter_params = {k.replace(f'filter_{best_filter_func_name}_', ''): v 
